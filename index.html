@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meditation Timer (mindfuljoy.app)</title>
+<meta name="description" content="A free, simple meditation timer with interval bells, a breathing pacer, and reflection prompts.">
+<meta name="theme-color" content="#f3f5ef">
+<link rel="canonical" href="https://mindfuljoy.app/">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Meditation Timer (mindfuljoy.app)">
+<meta property="og:title" content="Meditation Timer (mindfuljoy.app)">
+<meta property="og:description" content="A free, simple meditation timer with interval bells, a breathing pacer, and reflection prompts.">
+<meta property="og:url" content="https://mindfuljoy.app/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script src="assets/js/themes.js"></script>
+<!-- ===== GOOGLE ADSENSE: LOADER (publisher ca-pub-8467685368663778) =====
+     Ad units go in the "ADSENSE AD SLOT" comments further down each page. ===== -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8467685368663778"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<div class="topbar">
+  <div class="mark"><a href="index.html">Meditation Timer<span class="mark-domain">(mindfuljoy.app)</span></a></div>
+  <div class="top-actions">
+    <div class="theme-menu" id="themeMenu">
+      <button type="button" class="icon-btn" id="themeBtn" aria-label="Color theme" aria-haspopup="true" aria-expanded="false" aria-controls="themePop" title="Color theme"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      <div class="theme-pop" id="themePop" hidden>
+        <label for="schemeSelect">Color theme</label>
+        <select id="schemeSelect"></select>
+      </div>
+    </div>
+    <a class="donate-btn" id="donateBtn" href="https://ko-fi.com/cpiccirilli" target="_blank" rel="noopener">Donations</a>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Tools">
+  <button class="tab-btn active" id="tabBtnTimer" data-tab="timer" aria-pressed="true">Timer</button>
+  <button class="tab-btn" id="tabBtnBreathe" data-tab="breathe" aria-pressed="false">Breathe</button>
+  <button class="tab-btn" id="tabBtnReflect" data-tab="reflect" aria-pressed="false">Reflect</button>
+</nav>
+
+<main class="tab-panel active" id="panel-timer">
+  <div class="ring-wrap">
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="track" cx="110" cy="110" r="100"></circle>
+      <circle class="progress" id="ringProgress" cx="110" cy="110" r="100"></circle>
+    </svg>
+    <div class="ring-center">
+      <div class="time" id="timeDisplay">20:00</div>
+      <div class="phase" id="phaseLabel">Ready</div>
+    </div>
+  </div>
+
+  <div class="options-row">
+    <div class="len-field">
+      <label for="durationSelect">Session length</label>
+      <select id="durationSelect"></select>
+    </div>
+    <button class="settings-btn" id="settingsBtn">Bell Settings</button>
+  </div>
+  <div class="duration-row" id="customLenRow" hidden>
+    <label for="customLenInput">Minutes</label>
+    <input class="num-input" type="number" id="customLenInput" min="1" max="240" value="25" inputmode="numeric">
+  </div>
+  <p class="len-note" id="openNote" hidden>Counts up from zero until you press reset. Interval bells keep ringing.</p>
+
+  <div class="controls">
+    <button class="btn reset-btn" id="resetBtn" aria-label="Reset">&#8634;</button>
+    <button class="btn play-btn" id="playBtn" aria-label="Start">&#9654;</button>
+    <div style="width:52px;"></div>
+  </div>
+  <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; B: Bell Settings</p>
+</main>
+
+<section class="tab-panel" id="panel-breathe">
+  <div class="duration-row">
+    <label for="patternSelect">Pattern</label>
+    <select id="patternSelect">
+      <option value="box">Box breathing (4-4-4-4)</option>
+      <option value="478">4-7-8</option>
+      <option value="coherent">Coherent (5-5)</option>
+    </select>
+  </div>
+  <div class="duration-row">
+    <label for="cyclesSelect">Cycles</label>
+    <select id="cyclesSelect">
+      <option value="3">3</option>
+      <option value="5" selected>5</option>
+      <option value="8">8</option>
+      <option value="12">12</option>
+    </select>
+  </div>
+  <div class="breath-wrap">
+    <div class="breath-circle" id="breathCircle"><span id="breathLabel">Ready</span></div>
+  </div>
+  <div class="cycle-count" id="breathCycleCount"></div>
+  <div class="controls" style="margin-top:14px;">
+    <button class="btn play-btn" id="breathPlayBtn" aria-label="Start breathing">&#9654;</button>
+  </div>
+</section>
+
+<section class="tab-panel" id="panel-reflect">
+  <div class="reflect-card"><p id="reflectText">Tap below for a reflection prompt.</p></div>
+  <button class="reflect-btn" id="reflectBtn">New prompt</button>
+</section>
+
+<!-- ===== ADSENSE AD SLOT 1 (all tools): place an ad unit here, below the Timer / Breathe / Reflect tools and above the footer.
+     Keep ads well clear of the play, pause and reset buttons so they are never tapped by accident (AdSense policy). ===== -->
+
+<footer>
+  <a href="about.html">About</a>
+  <a href="privacy.html">Privacy Policy</a>
+  <a href="terms.html">Terms of Service</a>
+</footer>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Bell Settings">
+  <button class="icon-btn panel-close" id="closeBtn" aria-label="Close settings">&#10005;</button>
+  <h2>Bell Settings</h2>
+
+  <div class="field-group">
+    <div class="row-label"><span>Preparation delay</span></div>
+    <div class="row-note">A quiet moment before the session begins, so you can settle before the start bell.</div>
+    <select id="prepSelect" style="width:100%;">
+      <option value="0">Off</option>
+      <option value="3">3 seconds</option>
+      <option value="5" selected>5 seconds</option>
+      <option value="10">10 seconds</option>
+      <option value="15">15 seconds</option>
+      <option value="30">30 seconds</option>
+    </select>
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>Bell sound</span></div>
+    <div class="row-note">Used for the start and end bells. Interval bells always use a separate, higher-toned bell.</div>
+    <div class="inline-row">
+      <select id="bellSelect" aria-label="Bell sound"></select>
+      <button type="button" class="small-btn" id="previewBtn">Preview</button>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>Bell volume</span><span id="volumeLabel" style="color:var(--text-dim); font-size:.85rem;">100%</span></div>
+    <input type="range" id="volumeRange" min="10" max="100" step="5" value="100" aria-label="Bell volume">
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>Start bell</span>
+      <label class="switch"><input type="checkbox" id="startEnabled" checked><span class="slider"></span></label>
+    </div>
+    <div id="startBody" class="inline-row">
+      <span style="font-size:.85rem; color:var(--text-dim);">Number of bells</span>
+      <select id="startCount" aria-label="Number of start bells"></select>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>End bell</span>
+      <label class="switch"><input type="checkbox" id="endEnabled" checked><span class="slider"></span></label>
+    </div>
+    <div id="endBody" class="inline-row">
+      <span style="font-size:.85rem; color:var(--text-dim);">Number of bells</span>
+      <select id="endCount" aria-label="Number of end bells"></select>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>Interval bells</span>
+      <label class="switch"><input type="checkbox" id="intervalEnabled"><span class="slider"></span></label>
+    </div>
+    <div class="row-note">Sound a bell at points during your sitting, either on a repeating interval or at specific times you choose.</div>
+
+    <div id="intervalBody" class="sub-disabled">
+      <div class="mode-toggle">
+        <button type="button" id="modeRegularBtn" class="active">Repeating</button>
+        <button type="button" id="modeCustomBtn">Custom times</button>
+      </div>
+
+      <div id="regularFields">
+        <div class="inline-row">
+          <span style="font-size:.85rem; color:var(--text-dim);">Every</span>
+          <select id="intervalEvery"></select>
+        </div>
+      </div>
+
+      <div id="customFields" style="display:none;">
+        <div class="chip-input">
+          <input type="number" id="customMinuteInput" min="1" max="59" placeholder="Minutes in, e.g. 10">
+          <button type="button" id="addCustomBtn">Add</button>
+        </div>
+        <div class="chips" id="customChips"></div>
+      </div>
+    </div>
+  </div>
+  <p class="credits">Bell recordings are CC0 (public domain) samples from freesound.org by LozKaye, Garuda1982, ryancacophony, nkuitse and fauxpress, gathered in the open-source &ldquo;meditation&rdquo; app by nyxkn.</p>
+</aside>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Bell recordings - credits and licenses
+=======================================
+
+All recordings are released under Creative Commons CC0 1.0 Universal (public domain dedication).
+Source: freesound.org. Gathered, with license details, in the open-source "meditation" project by nyxkn:
+https://github.com/nyxkn/meditation
+
+bowl.mp3      Singing Bowl                         Garuda1982     https://freesound.org/people/Garuda1982/sounds/116315/
+burma.mp3     Burmese Bell                         LozKaye        https://freesound.org/people/LozKaye/sounds/94024/
+singing.mp3   Singing Bell                         ryancacophony  https://freesound.org/people/ryancacophony/sounds/202017/
+gong.mp3      Zen Gong                             nkuitse        https://freesound.org/people/nkuitse/sounds/18654/
+interval.mp3  Interval Bell (fixed, higher tone)   fauxpress      https://freesound.org/people/fauxpress/sounds/42095/
+
+Modifications for this site: trimmed, volume-normalized, faded at the end, converted to mono MP3.
