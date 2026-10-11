@@ -57,41 +57,35 @@
   row.appendChild(wrap);
   brand.appendChild(row);
 
-  // Change UPDATE.id whenever there is a new announcement, so it shows again
-  // for people who dismissed the previous one.
+  // The note shows on every page load. The close button hides it only until the
+  // next page load or refresh; nothing is saved on the device.
   var UPDATE = {
-    id: '2026-10-articles',
     text: 'New: Articles coming soon.',
     href: 'articles.html',
     linkText: 'Details'
   };
-  var KEY = 'mj.update.dismissed';
-  function dismissed() { try { return localStorage.getItem(KEY) === UPDATE.id; } catch (e) { return false; } }
-  if (!dismissed()) {
-    var note = document.createElement('div');
-    note.className = 'update-note';
-    note.setAttribute('role', 'status');
-    var msg = document.createElement('span');
-    msg.className = 'update-text';
-    msg.appendChild(document.createTextNode(UPDATE.text + ' '));
-    var link = document.createElement('a');
-    link.href = UPDATE.href;
-    link.textContent = UPDATE.linkText;
-    msg.appendChild(link);
-    var x = document.createElement('button');
-    x.type = 'button';
-    x.className = 'update-close';
-    x.setAttribute('aria-label', 'Dismiss update');
-    x.innerHTML = '&times;';
-    x.addEventListener('click', function () {
-      try { localStorage.setItem(KEY, UPDATE.id); } catch (e) {}
-      note.remove();
-      btn.focus();
-    });
-    note.appendChild(msg);
-    note.appendChild(x);
-    row.appendChild(note);
-  }
+  var note = document.createElement('div');
+  note.className = 'update-note';
+  note.setAttribute('role', 'status');
+  var msg = document.createElement('span');
+  msg.className = 'update-text';
+  msg.appendChild(document.createTextNode(UPDATE.text + ' '));
+  var link = document.createElement('a');
+  link.href = UPDATE.href;
+  link.textContent = UPDATE.linkText;
+  msg.appendChild(link);
+  var x = document.createElement('button');
+  x.type = 'button';
+  x.className = 'update-close';
+  x.setAttribute('aria-label', 'Dismiss update');
+  x.innerHTML = '&times;';
+  x.addEventListener('click', function () {
+    note.remove();
+    btn.focus();
+  });
+  note.appendChild(msg);
+  note.appendChild(x);
+  row.appendChild(note);
 
   function setOpen(open, returnFocus) {
     pop.hidden = !open;
