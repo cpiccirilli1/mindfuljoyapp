@@ -30,13 +30,15 @@ CONTENT
 
 SITE / OPS
 ----------
+[ ] When articles are published: add them to About features and to the
+    Terms (written content is general information, not medical advice)
 [ ] Merge dev into main after the dev preview is approved
 [ ] After AdSense approval: replace the current cookie banner (Accept /
     Reject-to-google.com) with AdSense's own consent message
     (Privacy & messaging). Keep the current banner until then.
-[ ] Change "Meditation Timer (mindfuljoy.app)" to "Mindful Joy" in the
+[x] Change "Meditation Timer (mindfuljoy.app)" to "Mindful Joy" in the
     About, Privacy, and Terms body text
-[ ] Hamburger menu layout: under the title, or beside it
+[x] Hamburger menu layout: under the title, or beside it (beside, done)
 [ ] Update README (old name and file list; add Articles page, menu,
     consent banner, wrangler.jsonc)
 [ ] After AdSense approval: place ad units on content pages only
