@@ -16,7 +16,7 @@ assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
   js/app.js           Timer, bells, breathing pacer, settings (index.html only)
-  js/site.js          Theme menu for the About, Privacy and Terms pages
+  js/site.js          Theme menu and Back to top button for the About, Privacy and Terms pages
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon
