@@ -7,6 +7,7 @@
 
   var PAGES = [
     { href: 'index.html',   label: 'Timer' },
+    { href: 'articles.html', label: 'Articles' },
     { href: 'about.html',   label: 'About' },
     { href: 'privacy.html', label: 'Privacy Policy' },
     { href: 'terms.html',   label: 'Terms of Service' }
@@ -49,7 +50,48 @@
 
   wrap.appendChild(btn);
   wrap.appendChild(pop);
-  brand.appendChild(wrap);
+
+  // Row under the title: menu button, then a dismissible "updates" note.
+  var row = document.createElement('div');
+  row.className = 'brand-row';
+  row.appendChild(wrap);
+  brand.appendChild(row);
+
+  // Change UPDATE.id whenever there is a new announcement, so it shows again
+  // for people who dismissed the previous one.
+  var UPDATE = {
+    id: '2026-10-articles',
+    text: 'New: Articles coming soon.',
+    href: 'articles.html',
+    linkText: 'Details'
+  };
+  var KEY = 'mj.update.dismissed';
+  function dismissed() { try { return localStorage.getItem(KEY) === UPDATE.id; } catch (e) { return false; } }
+  if (!dismissed()) {
+    var note = document.createElement('div');
+    note.className = 'update-note';
+    note.setAttribute('role', 'status');
+    var msg = document.createElement('span');
+    msg.className = 'update-text';
+    msg.appendChild(document.createTextNode(UPDATE.text + ' '));
+    var link = document.createElement('a');
+    link.href = UPDATE.href;
+    link.textContent = UPDATE.linkText;
+    msg.appendChild(link);
+    var x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'update-close';
+    x.setAttribute('aria-label', 'Dismiss update');
+    x.innerHTML = '&times;';
+    x.addEventListener('click', function () {
+      try { localStorage.setItem(KEY, UPDATE.id); } catch (e) {}
+      note.remove();
+      btn.focus();
+    });
+    note.appendChild(msg);
+    note.appendChild(x);
+    row.appendChild(note);
+  }
 
   function setOpen(open, returnFocus) {
     pop.hidden = !open;

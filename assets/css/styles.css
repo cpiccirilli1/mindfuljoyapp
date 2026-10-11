@@ -354,3 +354,41 @@
   .menu-pop a[aria-current="page"]{ color:var(--accent); font-weight:600; }
   /* The global svg rule rotates the timer ring; keep the menu icon upright. */
   .menu-btn svg{ width:20px; height:20px; transform:none; }
+
+  /* ---------- Brand row + updates note ---------- */
+  .brand-row{ display:flex; align-items:center; gap:10px; min-width:0; max-width:100%; }
+  .update-note{
+    display:flex; align-items:center; gap:6px; min-width:0;
+    background:var(--accent-soft); border:1px solid var(--border); border-radius:10px;
+    padding:6px 6px 6px 10px; font-size:.78rem; line-height:1.35; color:var(--text);
+  }
+  .update-text{ min-width:0; }
+  .update-text a{ color:var(--accent); font-weight:500; white-space:nowrap; }
+  .update-close{
+    flex:none; width:28px; height:28px; border:none; border-radius:50%; background:none;
+    color:var(--text-dim); font-size:1.2rem; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .update-close:hover{ color:var(--text); background:var(--border); }
+
+  /* ---------- Cookie consent banner ---------- */
+  .consent{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;
+    padding:14px max(20px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+    background:var(--surface); color:var(--text); border-top:2px solid var(--border);
+    box-shadow:0 -6px 20px rgba(0,0,0,.15);
+  }
+  .consent-text{ margin:0; font-size:.85rem; line-height:1.5; max-width:640px; }
+  .consent-text a{ color:var(--accent); }
+  .consent-actions{ display:flex; gap:10px; }
+  .consent-btn{
+    min-height:44px; padding:0 22px; border-radius:999px; font-family:inherit; font-size:.88rem; font-weight:500;
+    cursor:pointer; border:1px solid var(--accent); transition:background .2s, color .2s;
+  }
+  .consent-reject{ background:none; color:var(--accent); }
+  .consent-reject:hover{ background:var(--accent-soft); }
+  .consent-accept{ background:var(--accent); color:var(--bg); }
+  .consent-accept:hover{ filter:brightness(1.08); }
+  /* Keep the back-to-top button out from under the banner until a choice is made. */
+  .consent-open .to-top{ visibility:hidden; }
