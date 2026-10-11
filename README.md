@@ -55,6 +55,15 @@ file only: the menu on every page builds itself from it. Keep the `id` values of
 because visitors' saved choices refer to them. For readable text, keep the dim and accent colors at least
 4.5:1 against the background.
 
+## License
+
+The code in this repository (HTML, CSS and JavaScript) is released under the MIT License. See the `LICENSE` file.
+
+Third-party assets keep their own licenses:
+
+- **Bell recordings** (`assets/audio/*.mp3`): Creative Commons CC0 1.0 (public domain). Credits and sources are in `assets/audio/CREDITS.txt`.
+- **Inter typeface**: SIL Open Font License 1.1, loaded from Google Fonts.
+
 ## Notes
 
 - Visitors' settings are saved in their own browser (localStorage). Nothing is sent to a server.
