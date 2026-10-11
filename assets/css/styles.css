@@ -330,7 +330,10 @@
   .to-top svg{ width:20px; height:20px; transform:none; }
 
   /* ---------- Brand block + hamburger menu ---------- */
-  .brand{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; min-width:0; }
+  .brand{ display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:12px; row-gap:8px; align-items:center; min-width:0; }
+  .brand .nav-menu{ grid-column:1; grid-row:1; }
+  .brand .mark{ grid-column:2; grid-row:1; }
+  .brand .update-note{ grid-column:2; grid-row:2; justify-self:start; max-width:100%; }
   .nav-menu{ position:relative; }
   .menu-btn{
     background:none; border:1px solid var(--border); color:var(--text-dim);
@@ -356,7 +359,6 @@
   .menu-btn svg{ width:20px; height:20px; transform:none; }
 
   /* ---------- Brand row + updates note ---------- */
-  .brand-row{ display:flex; align-items:center; gap:10px; min-width:0; max-width:100%; }
   .update-note{
     display:flex; align-items:center; gap:6px; min-width:0;
     background:var(--accent-soft); border:1px solid var(--border); border-radius:10px;

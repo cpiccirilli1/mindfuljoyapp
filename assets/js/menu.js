@@ -51,11 +51,8 @@
   wrap.appendChild(btn);
   wrap.appendChild(pop);
 
-  // Row under the title: menu button, then a dismissible "updates" note.
-  var row = document.createElement('div');
-  row.className = 'brand-row';
-  row.appendChild(wrap);
-  brand.appendChild(row);
+  // Layout: menu button to the left of the title; the "updates" note sits under the title.
+  brand.insertBefore(wrap, mark);
 
   // The note shows on every page load. The close button hides it only until the
   // next page load or refresh; nothing is saved on the device.
@@ -85,7 +82,7 @@
   });
   note.appendChild(msg);
   note.appendChild(x);
-  row.appendChild(note);
+  brand.appendChild(note);
 
   function setOpen(open, returnFocus) {
     pop.hidden = !open;
