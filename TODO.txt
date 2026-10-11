@@ -1,0 +1,48 @@
+MINDFUL JOY (mindfuljoy.app) - TODO
+===================================
+Mark finished items with [x] and keep them here for history.
+
+FEATURES
+--------
+[ ] Mixed time intervals to account for walking meditation
+    - Let a session be built from several segments instead of one block
+      (for example: 20 min sitting, 10 min walking, 20 min sitting)
+    - Choose a type and length for each segment
+    - Add, remove, and reorder segments
+    - Bell sounds when moving from one segment to the next
+    - Show the current segment name and the time left in it
+    - Save segment layouts on the device (localStorage)
+    - Presets for common sit / walk patterns
+[ ] Session history and streaks, kept on the device
+[ ] Ambient sound options (rain, ocean, etc.)
+[ ] Focus / Pomodoro timer
+[ ] Stretch or pose sequencer
+[ ] Offline use and "install to home screen" support (PWA)
+[ ] Share preview image for links (og:image)
+
+CONTENT
+-------
+[ ] Guide: What is mindfulness?
+[ ] Guide: How to start meditating
+[ ] Guide: Box, 4-7-8, and coherent breathing explained
+[ ] Guide: Walking meditation (pairs with the mixed-intervals feature)
+[ ] Contact page
+
+SITE / OPS
+----------
+[ ] Merge dev into main after the dev preview is approved
+[ ] Cookie consent: keep the Reject-to-google.com banner, or switch to
+    AdSense's own consent message (Privacy & messaging)
+[ ] Change "Meditation Timer (mindfuljoy.app)" to "Mindful Joy" in the
+    About, Privacy, and Terms body text
+[ ] Hamburger menu layout: under the title, or beside it
+[ ] Update README (old name and file list; add Articles page, menu,
+    consent banner, wrangler.jsonc)
+[ ] After AdSense approval: place ad units on content pages only
+[ ] When articles are published: remove noindex from articles.html and
+    add it to sitemap.xml
+
+LEARNING JAVASCRIPT
+-------------------
+[ ] Move timer logic into small functions and add a few tests
+[ ] Split app.js (about 680 lines) into separate files by feature
