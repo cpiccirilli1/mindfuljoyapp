@@ -9,12 +9,12 @@ index.html            Timer, Breathe and Reflect tools
 about.html            About page (features, credits and licenses)
 privacy.html          Privacy Policy
 terms.html            Terms of Service
-ads.txt               Google AdSense publisher line (pub-8467685368663778)
+ads.txt               Google AdSense publisher line (keep the filename lowercase) (pub-8467685368663778)
 robots.txt            Search engine rules (points to the sitemap)
 sitemap.xml           The four pages, using https://mindfuljoy.app
 assets/
-  css/styles.css      All styling and color themes
-  js/themes.js        Shared color themes (loaded on every page)
+  css/styles.css      All styling
+  js/themes.js        The 23 color themes (loaded on every page)
   js/app.js           Timer, bells, breathing pacer, settings (index.html only)
   js/site.js          Theme menu for the About, Privacy and Terms pages
   audio/*.mp3         Five CC0 bell recordings
@@ -46,6 +46,14 @@ your AdSense account (Privacy & messaging) so personalized ads are only served w
 Privacy Policy if you add other services later, such as analytics.
 
 Keep ads clear of the play, pause and reset buttons so they are not tapped by accident.
+
+## Color themes
+
+There are 23 themes in three groups (Light, Dark, High Contrast). They all live in `assets/js/themes.js`.
+Each theme is one line with an `id`, a `group`, a `name` and its colors. To add or change a theme, edit that
+file only: the menu on every page builds itself from it. Keep the `id` values of existing themes unchanged,
+because visitors' saved choices refer to them. For readable text, keep the dim and accent colors at least
+4.5:1 against the background.
 
 ## Notes
 

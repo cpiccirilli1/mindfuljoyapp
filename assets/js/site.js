@@ -5,13 +5,8 @@
   var btn = document.getElementById('themeBtn');
   var pop = document.getElementById('themePop');
   var menu = document.getElementById('themeMenu');
-  MJ.SCHEMES.forEach(function(s){
-    var opt = document.createElement('option');
-    opt.value = s.id; opt.textContent = s.name;
-    select.appendChild(opt);
-  });
   var current = MJ.find(MJ.savedScheme()) || MJ.find('sage');
-  select.value = current.id;
+  MJ.fillSelect(select, current.id);
   function open(){ pop.hidden = false; btn.setAttribute('aria-expanded','true'); }
   function close(ret){
     var was = !pop.hidden;

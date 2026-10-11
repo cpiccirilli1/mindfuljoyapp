@@ -582,12 +582,7 @@
   const applyScheme = window.MJ.applyScheme;
 
   const schemeSelect = document.getElementById('schemeSelect');
-  SCHEMES.forEach(s=>{
-    const opt = document.createElement('option');
-    opt.value = s.id; opt.textContent = s.name;
-    if(s.id==='sage') opt.selected = true;
-    schemeSelect.appendChild(opt);
-  });
+  window.MJ.fillSelect(schemeSelect, 'sage');
   schemeSelect.addEventListener('change', ()=>{
     const s = SCHEMES.find(x=>x.id===schemeSelect.value);
     if(s) applyScheme(s);
