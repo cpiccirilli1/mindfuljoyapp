@@ -4,7 +4,7 @@ Mark finished items with [x] and keep them here for history.
 
 FEATURES
 --------
-[ ] Mixed time intervals to account for walking meditation
+[x] Mixed time intervals to account for walking meditation
     - Let a session be built from several segments instead of one block
       (for example: 20 min sitting, 10 min walking, 20 min sitting)
     - Choose a type and length for each segment

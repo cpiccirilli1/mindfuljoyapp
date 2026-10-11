@@ -7,7 +7,7 @@
     if(m===20) opt.selected = true;
     durationSelect.appendChild(opt);
   }
-  [['custom','Custom length'],['open','Open-ended (count up)']].forEach(([v,t])=>{
+  [['sequence','Sit + walk'],['custom','Custom length'],['open','Open-ended (count up)']].forEach(([v,t])=>{
     const opt = document.createElement('option');
     opt.value = v; opt.textContent = t;
     durationSelect.appendChild(opt);
@@ -36,7 +36,7 @@
   let openEnded = false;
   let storeReady = false; // true once saved settings have been loaded
 
-  const settings = { startEnabled:true, endEnabled:true, intervalEnabled:false, mode:'regular', prepSeconds:5, bellSound:'bowl', startCount:1, endCount:1, volume:1 };
+  const settings = { startEnabled:true, endEnabled:true, intervalEnabled:false, mode:'regular', prepSeconds:5, bellSound:'bowl', startCount:1, endCount:1, segEnabled:true, segCount:1, volume:1 };
   document.getElementById('prepSelect').addEventListener('change', e=>{ settings.prepSeconds = Number(e.target.value); });
 
   // ---------- DOM ----------
@@ -176,7 +176,7 @@
     activeSources = [];
   }
 
-  // kind: 'start' | 'end' use the chosen bell (count strikes); 'interval' is always the fixed higher bell.
+  // kind: 'start' | 'end' | 'segment' use the chosen bell (count strikes); 'interval' is always the fixed higher bell.
   function chime(kind, count){
     if(kind === 'interval') playSound('interval', 1, INTERVAL_GAIN);
     else playSound(settings.bellSound, count || 1, 0.9);
@@ -185,7 +185,8 @@
     if(kind==='start' && !settings.startEnabled) return;
     if(kind==='end' && !settings.endEnabled) return;
     if(kind==='interval' && !settings.intervalEnabled) return;
-    chime(kind, kind==='start' ? settings.startCount : kind==='end' ? settings.endCount : 1);
+    if(kind==='segment' && !settings.segEnabled) return;
+    chime(kind, kind==='start' ? settings.startCount : kind==='end' ? settings.endCount : kind==='segment' ? settings.segCount : 1);
   }
   loadSounds();
 
@@ -206,11 +207,62 @@
     return pts.sort((a,b)=>a-b);
   }
 
+  // ---------- Sit / walk sequence (segments) ----------
+  const SEG_NAMES = { sit:'Sitting', walk:'Walking' };
+  const MAX_SEGMENTS = 12, MAX_SEG_MIN = 120;
+  let segments = [{type:'sit',minutes:20},{type:'walk',minutes:10},{type:'sit',minutes:20}];
+  let lastSeg = 0;   // index of the segment the timer is currently in
+  const isSeq = () => durationSelect.value === 'sequence';
+  function cleanSegments(list){
+    if(!Array.isArray(list)) return null;
+    const out = list.slice(0, MAX_SEGMENTS).map(x=>({
+      type: x && x.type === 'walk' ? 'walk' : 'sit',
+      minutes: Math.min(MAX_SEG_MIN, Math.max(1, Math.round(Number(x && x.minutes)) || 1))
+    }));
+    return out.length ? out : null;
+  }
+  function seqTotalSeconds(){ return segments.reduce((t,sg)=> t + sg.minutes*60, 0); }
+  // Cumulative end time (in seconds) of each segment.
+  function segEnds(){ let t = 0; return segments.map(sg=> (t += sg.minutes*60)); }
+  function segIndexAt(elapsed){
+    const ends = segEnds();
+    for(let i=0;i<ends.length;i++){ if(elapsed < ends[i]) return i; }
+    return ends.length - 1;
+  }
+  function spokenSeg(i){ const m = segments[i].minutes; return SEG_NAMES[segments[i].type] + ', ' + m + (m===1 ? ' minute' : ' minutes'); }
+  function segLabel(i){ return SEG_NAMES[segments[i].type] + ' \u00b7 ' + (i+1) + ' of ' + segments.length; }
+  function sessionLabel(elapsed){ return isSeq() ? segLabel(segIndexAt(elapsed || 0)) : 'Sitting'; }
+  function seqSummary(){
+    return segments.map(sg=> (sg.type==='walk' ? 'Walk ' : 'Sit ') + sg.minutes).join(' \u00b7 ');
+  }
+  const segStatus = document.getElementById('segStatus');
+  // Sequence display: big clock and ring show the current segment; the line
+  // under the ring shows what is next and the total time left.
+  function renderSeq(elapsed){
+    const ends = segEnds();
+    const i = segIndexAt(elapsed);
+    const start = i ? ends[i-1] : 0;
+    const segTotal = ends[i] - start;
+    const segRemaining = Math.max(0, ends[i] - elapsed);
+    timeDisplay.textContent = fmt(segRemaining);
+    updateRing(segRemaining, segTotal);
+    phaseLabel.textContent = segLabel(i);
+    const totalLeft = Math.max(0, ends[ends.length-1] - elapsed);
+    const next = i < segments.length-1
+      ? 'Next: ' + SEG_NAMES[segments[i+1].type] + ' (' + segments[i+1].minutes + ' min)'
+      : 'Last segment';
+    segStatus.textContent = next + ' \u00b7 Total left ' + fmt(totalLeft);
+  }
+  function renderSeqIdle(){
+    segStatus.textContent = seqSummary() + ' \u00b7 ' + Math.round(seqTotalSeconds()/60) + ' min total';
+  }
+
   // ---------- Timer control ----------
   function readLength(){
     const v = durationSelect.value;
     if(v === 'open'){ openEnded = true; totalSeconds = 0; return; }
     openEnded = false;
+    if(v === 'sequence'){ totalSeconds = seqTotalSeconds(); return; }
     if(v === 'custom'){
       let m = Math.round(Number(customLenInput.value));
       if(!m || m < 1) m = 1;
@@ -224,11 +276,14 @@
     phaseTotal = totalSeconds;
     if(openEnded){ timeDisplay.textContent = '00:00'; ring.style.strokeDashoffset = CIRC; }
     else render(totalSeconds);
+    if(isSeq()) renderSeqIdle();
   }
   function renderSession(elapsed){
     if(openEnded){
       timeDisplay.textContent = fmt(elapsed);
       ring.style.strokeDashoffset = CIRC * (1 - ((elapsed % 60) / 60));
+    } else if(isSeq()){
+      renderSeq(elapsed);
     } else {
       render(phaseTotal - elapsed);
     }
@@ -240,7 +295,8 @@
     renderIdle();
     phaseLabel.textContent = 'Ready';
   }
-  function setLengthLocked(b){ durationSelect.disabled = b; customLenInput.disabled = b; }
+  const seqEditor = document.getElementById('seqEditor');
+  function setLengthLocked(b){ durationSelect.disabled = b; customLenInput.disabled = b; seqEditor.disabled = b; }
 
   function stopTick(){
     if(tickHandle){ clearInterval(tickHandle); tickHandle = null; }
@@ -269,6 +325,15 @@
     if(phase === 'prep'){ renderPrep(remaining); }
     else {
       render(remaining);
+      if(isSeq()){
+        renderSeq(elapsed);
+        const idx = segIndexAt(elapsed);
+        if(idx > lastSeg){
+          lastSeg = idx;
+          playBell('segment');
+          announce(spokenSeg(idx));
+        }
+      }
       triggerPoints().forEach(pt=>{
         if(!triggered.has(pt) && elapsed >= pt){
           triggered.add(pt);
@@ -285,9 +350,10 @@
     phasePausedElapsed = 0;
     phaseStartTimestamp = Date.now();
     triggered.clear();
+    lastSeg = 0;
     playBell('start');
-    phaseLabel.textContent = 'Sitting';
-    announce('Session started');
+    phaseLabel.textContent = sessionLabel(0);
+    announce(isSeq() ? 'Session started. ' + spokenSeg(0) : 'Session started');
     renderSession(0);
   }
 
@@ -310,15 +376,17 @@
         phase = 'session';
         phaseTotal = openEnded ? Infinity : totalSeconds;
         triggered.clear();
+        lastSeg = 0;
         playBell('start');
-        phaseLabel.textContent = 'Sitting';
-        announce('Session started');
+        phaseLabel.textContent = sessionLabel(0);
+        announce(isSeq() ? 'Session started. ' + spokenSeg(0) : 'Session started');
+        renderSession(0);
       }
       phaseStartTimestamp = Date.now();
     } else {
       // resuming from pause, mid-prep or mid-session
       phaseStartTimestamp = Date.now() - phasePausedElapsed*1000;
-      phaseLabel.textContent = phase === 'prep' ? 'Starting in' : 'Sitting';
+      phaseLabel.textContent = phase === 'prep' ? 'Starting in' : sessionLabel(phasePausedElapsed);
       announce('Resumed');
     }
     tickHandle = setInterval(tick, 200);
@@ -348,6 +416,7 @@
     phaseTotal = totalSeconds;
     phasePausedElapsed = 0;
     setLengthLocked(false);
+    if(isSeq()) renderSeqIdle();
   }
 
   function reset(){
@@ -358,6 +427,7 @@
     phase = 'idle';
     phasePausedElapsed = 0;
     triggered.clear();
+    lastSeg = 0;
     readLength();
     renderIdle();
     playBtn.innerHTML = '&#9654;';
@@ -372,6 +442,8 @@
   function syncLengthUI(){
     customLenRow.hidden = durationSelect.value !== 'custom';
     openNote.hidden = durationSelect.value !== 'open';
+    seqEditor.hidden = !isSeq();
+    segStatus.hidden = !isSeq();
   }
   durationSelect.addEventListener('change', ()=>{ syncLengthUI(); if(phase==='idle') setDuration(); });
   ['input','change'].forEach(t=> customLenInput.addEventListener(t, ()=>{ if(phase==='idle' && durationSelect.value==='custom') setDuration(); }));
@@ -409,7 +481,7 @@
   });
   volumeRange.addEventListener('change', ()=>{ if(storeReady){ stopBells(); playSound(settings.bellSound, 1, 0.9); } });
   document.getElementById('previewBtn').addEventListener('click', ()=>{ stopBells(); playSound(settings.bellSound, 1, 0.9); });
-  [['startCount','startCount'],['endCount','endCount']].forEach(([id,key])=>{
+  [['startCount','startCount'],['endCount','endCount'],['segCount','segCount']].forEach(([id,key])=>{
     const sel = document.getElementById(id);
     for(let n=1;n<=5;n++){
       const opt = document.createElement('option');
@@ -425,6 +497,11 @@
   document.getElementById('endEnabled').addEventListener('change', e=>{
     settings.endEnabled = e.target.checked;
     document.getElementById('endBody').classList.toggle('sub-disabled', !e.target.checked);
+  });
+
+  document.getElementById('segEnabled').addEventListener('change', e=>{
+    settings.segEnabled = e.target.checked;
+    document.getElementById('segBody').classList.toggle('sub-disabled', !e.target.checked);
   });
 
   const intervalBody = document.getElementById('intervalBody');
@@ -603,6 +680,164 @@
   document.addEventListener('click', e=>{ if(!themePop.hidden && !themeMenu.contains(e.target)) closeThemeMenu(false); });
   schemeSelect.addEventListener('change', ()=>{ if(storeReady) closeThemeMenu(true); });
 
+  // ---------- Sequence editor ----------
+  const segList = document.getElementById('segList');
+  const seqTotal = document.getElementById('seqTotal');
+  const seqMsg = document.getElementById('seqMsg');
+  const LAYOUT_KEY = 'still.layouts.v1';
+  function say(msg){ seqMsg.textContent = msg; announce(msg); }
+  function segmentsChanged(){
+    renderSegments();
+    if(phase === 'idle' && isSeq()) setDuration();
+  }
+  function renderSegments(){
+    segList.innerHTML = '';
+    segments.forEach((sg, i)=>{
+      const li = document.createElement('li');
+      li.className = 'seg-row';
+      li.dataset.i = i;
+      const num = document.createElement('span');
+      num.className = 'seg-num'; num.textContent = i + 1;
+      const type = document.createElement('select');
+      type.className = 'seg-type'; type.setAttribute('aria-label', 'Segment ' + (i+1) + ' type');
+      [['sit','Sit'],['walk','Walk']].forEach(([v,t])=>{
+        const o = document.createElement('option'); o.value = v; o.textContent = t;
+        if(sg.type === v) o.selected = true;
+        type.appendChild(o);
+      });
+      const mins = document.createElement('input');
+      mins.type = 'number'; mins.className = 'num-input seg-min'; mins.min = 1; mins.max = MAX_SEG_MIN;
+      mins.value = sg.minutes; mins.inputMode = 'numeric';
+      mins.setAttribute('aria-label', 'Segment ' + (i+1) + ' minutes');
+      const unit = document.createElement('span');
+      unit.className = 'seg-unit'; unit.textContent = 'min';
+      const mk = (cls, label, html, disabled)=>{
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'seg-btn ' + cls; b.setAttribute('aria-label', label + ' segment ' + (i+1));
+        b.innerHTML = html; b.disabled = !!disabled;
+        return b;
+      };
+      li.append(num, type, mins, unit,
+        mk('seg-up', 'Move up', '&#9650;', i === 0),
+        mk('seg-down', 'Move down', '&#9660;', i === segments.length-1),
+        mk('seg-remove', 'Remove', '&times;', segments.length === 1));
+      segList.appendChild(li);
+    });
+    seqTotal.textContent = Math.round(seqTotalSeconds()/60) + ' min total';
+    document.getElementById('addSitBtn').disabled = document.getElementById('addWalkBtn').disabled = segments.length >= MAX_SEGMENTS;
+  }
+  // Typing or choosing a value updates the data in place. The list is only
+  // redrawn for structural changes (move, add, remove, preset, load), so the
+  // field you are in never gets replaced while you use it.
+  function segValuesChanged(){
+    seqTotal.textContent = Math.round(seqTotalSeconds()/60) + ' min total';
+    if(phase === 'idle' && isSeq()) setDuration();
+  }
+  segList.addEventListener('change', e=>{
+    const li = e.target.closest('.seg-row'); if(!li) return;
+    const sg = segments[Number(li.dataset.i)];
+    if(e.target.classList.contains('seg-type')) sg.type = e.target.value === 'walk' ? 'walk' : 'sit';
+    if(e.target.classList.contains('seg-min')){
+      sg.minutes = Math.min(MAX_SEG_MIN, Math.max(1, Math.round(Number(e.target.value)) || 1));
+      e.target.value = sg.minutes;
+    }
+    segValuesChanged();
+  });
+  segList.addEventListener('input', e=>{
+    if(!e.target.classList.contains('seg-min')) return;
+    const v = Math.round(Number(e.target.value));
+    if(v >= 1 && v <= MAX_SEG_MIN){
+      segments[Number(e.target.closest('.seg-row').dataset.i)].minutes = v;
+      segValuesChanged();
+    }
+  });
+  segList.addEventListener('click', e=>{
+    const b = e.target.closest('.seg-btn'); if(!b) return;
+    const i = Number(b.closest('.seg-row').dataset.i);
+    if(b.classList.contains('seg-remove') && segments.length > 1) segments.splice(i, 1);
+    else if(b.classList.contains('seg-up') && i > 0) [segments[i-1], segments[i]] = [segments[i], segments[i-1]];
+    else if(b.classList.contains('seg-down') && i < segments.length-1) [segments[i+1], segments[i]] = [segments[i], segments[i+1]];
+    else return;
+    segmentsChanged();
+    // keep keyboard focus on the same kind of control after the list re-renders
+    const row = segList.children[b.classList.contains('seg-remove') ? Math.min(i, segments.length-1) : (b.classList.contains('seg-up') ? i-1 : i+1)];
+    const again = row && row.querySelector(b.classList.contains('seg-remove') ? '.seg-remove' : b.classList.contains('seg-up') ? '.seg-up' : '.seg-down');
+    if(again && !again.disabled) again.focus(); else if(row) row.querySelector('.seg-type').focus();
+  });
+  function addSeg(type){
+    if(segments.length >= MAX_SEGMENTS) return;
+    segments.push({type, minutes: type === 'walk' ? 10 : 20});
+    segmentsChanged();
+  }
+  document.getElementById('addSitBtn').addEventListener('click', ()=>addSeg('sit'));
+  document.getElementById('addWalkBtn').addEventListener('click', ()=>addSeg('walk'));
+
+  const PRESETS = {
+    'sit-walk-sit': [['sit',20],['walk',10],['sit',20]],
+    'sit-walk': [['sit',20],['walk',10]],
+    'walk-sit': [['walk',10],['sit',20]],
+    'rounds': [['sit',10],['walk',5],['sit',10],['walk',5]]
+  };
+  const presetSelect = document.getElementById('presetSelect');
+  presetSelect.addEventListener('change', ()=>{
+    const p = PRESETS[presetSelect.value];
+    if(!p) return;
+    segments = p.map(([type,minutes])=>({type, minutes}));
+    presetSelect.value = '';
+    segmentsChanged();
+    say('Preset applied: ' + seqSummary());
+  });
+
+  // Saved sequences (on this device only)
+  const layoutName = document.getElementById('layoutName');
+  const layoutSelect = document.getElementById('layoutSelect');
+  const savedBlock = document.getElementById('savedBlock');
+  function readLayouts(){
+    try{
+      const d = JSON.parse(localStorage.getItem(LAYOUT_KEY) || '[]');
+      return Array.isArray(d) ? d.filter(x=> x && typeof x.name === 'string' && cleanSegments(x.segments)) : [];
+    }catch(e){ return []; }
+  }
+  function writeLayouts(list){
+    try{ localStorage.setItem(LAYOUT_KEY, JSON.stringify(list)); return true; }catch(e){ return false; }
+  }
+  function renderLayouts(selectName){
+    const list = readLayouts();
+    layoutSelect.innerHTML = '';
+    list.forEach(l=>{
+      const o = document.createElement('option'); o.value = l.name; o.textContent = l.name;
+      if(l.name === selectName) o.selected = true;
+      layoutSelect.appendChild(o);
+    });
+    savedBlock.hidden = list.length === 0;
+  }
+  document.getElementById('saveLayoutBtn').addEventListener('click', ()=>{
+    const name = layoutName.value.trim().slice(0, 30);
+    if(!name){ say('Type a name first.'); layoutName.focus(); return; }
+    const list = readLayouts().filter(l=> l.name !== name);
+    list.push({ name, segments: segments.map(sg=>({type:sg.type, minutes:sg.minutes})) });
+    if(list.length > 20) list.shift();
+    if(!writeLayouts(list)){ say('Could not save on this device.'); return; }
+    layoutName.value = '';
+    renderLayouts(name);
+    say('Saved "' + name + '".');
+  });
+  document.getElementById('loadLayoutBtn').addEventListener('click', ()=>{
+    const l = readLayouts().find(x=> x.name === layoutSelect.value);
+    if(!l) return;
+    segments = cleanSegments(l.segments);
+    segmentsChanged();
+    say('Loaded "' + l.name + '": ' + seqSummary());
+  });
+  document.getElementById('deleteLayoutBtn').addEventListener('click', ()=>{
+    const name = layoutSelect.value; if(!name) return;
+    writeLayouts(readLayouts().filter(x=> x.name !== name));
+    renderLayouts();
+    say('Deleted "' + name + '".');
+  });
+  renderSegments();
+  renderLayouts();
+
   // ---------- Keyboard shortcuts ----------
   document.addEventListener('keydown', e=>{
     if(e.ctrlKey || e.metaKey || e.altKey) return;
@@ -634,7 +869,8 @@
         prep: $('prepSelect').value,
         intervalEnabled: $('intervalEnabled').checked, mode: settings.mode,
         intervalEvery: intervalEvery.value, customTimes: customTimes,
-        pattern: patternSelect.value, cycles: cyclesSelect.value
+        pattern: patternSelect.value, cycles: cyclesSelect.value,
+        segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: segments
       }));
     }catch(e){}
   }
@@ -669,8 +905,12 @@
       setVal('intervalEvery', d.intervalEvery);
       setVal('intervalEnabled', d.intervalEnabled);
       setVal('patternSelect', d.pattern); setVal('cyclesSelect', d.cycles);
+      setVal('segEnabled', d.segEnabled); setVal('segCount', d.segCount);
+      const saved = cleanSegments(d.segments);
+      if(saved){ segments = saved; renderSegments(); }
     }
     syncLengthUI();
+    if(phase === 'idle') setDuration();
     storeReady = true;
   }
   loadSettings();

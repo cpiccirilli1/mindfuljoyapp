@@ -58,6 +58,8 @@
     </div>
   </div>
 
+  <p class="seg-status" id="segStatus" hidden></p>
+
   <div class="options-row">
     <div class="len-field">
       <label for="durationSelect">Session length</label>
@@ -77,6 +79,43 @@
     <div style="width:52px;"></div>
   </div>
   <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; B: Bell Settings</p>
+
+  <!-- Sit / walk sequence editor: shown when "Sit / walk sequence" is chosen as the session length. -->
+  <fieldset class="seq" id="seqEditor" hidden>
+    <legend>Sit / walk sequence</legend>
+    <div class="seq-head"><span>Segments, in order</span><span id="seqTotal" class="seq-total"></span></div>
+    <ol class="seg-list" id="segList"></ol>
+    <div class="seg-actions">
+      <button type="button" class="small-btn" id="addSitBtn">+ Sit</button>
+      <button type="button" class="small-btn" id="addWalkBtn">+ Walk</button>
+    </div>
+    <div class="seq-block">
+      <label for="presetSelect">Preset</label>
+      <select id="presetSelect">
+        <option value="">Choose a preset&hellip;</option>
+        <option value="sit-walk-sit">Sit 20 &middot; Walk 10 &middot; Sit 20</option>
+        <option value="sit-walk">Sit 20 &middot; Walk 10</option>
+        <option value="walk-sit">Walk 10 &middot; Sit 20</option>
+        <option value="rounds">Sit 10 &middot; Walk 5 &middot; Sit 10 &middot; Walk 5</option>
+      </select>
+    </div>
+    <div class="seq-block">
+      <label for="layoutName">Save this sequence</label>
+      <div class="chip-input">
+        <input type="text" id="layoutName" maxlength="30" placeholder="Name, e.g. Morning practice">
+        <button type="button" id="saveLayoutBtn">Save</button>
+      </div>
+    </div>
+    <div class="seq-block" id="savedBlock" hidden>
+      <label for="layoutSelect">Saved sequences</label>
+      <div class="inline-row">
+        <select id="layoutSelect" aria-label="Saved sequences"></select>
+        <button type="button" class="small-btn" id="loadLayoutBtn">Load</button>
+        <button type="button" class="small-btn" id="deleteLayoutBtn">Delete</button>
+      </div>
+    </div>
+    <p class="seq-msg" id="seqMsg" role="status"></p>
+  </fieldset>
 </main>
 
 <section class="tab-panel" id="panel-breathe">
@@ -169,6 +208,17 @@
     <div id="endBody" class="inline-row">
       <span style="font-size:.85rem; color:var(--text-dim);">Number of bells</span>
       <select id="endCount" aria-label="Number of end bells"></select>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="row-label"><span>Segment change bell</span>
+      <label class="switch"><input type="checkbox" id="segEnabled" checked><span class="slider"></span></label>
+    </div>
+    <div class="row-note">Rings between segments in a sit / walk sequence.</div>
+    <div id="segBody" class="inline-row">
+      <span style="font-size:.85rem; color:var(--text-dim);">Number of bells</span>
+      <select id="segCount" aria-label="Number of segment change bells"></select>
     </div>
   </div>
 
