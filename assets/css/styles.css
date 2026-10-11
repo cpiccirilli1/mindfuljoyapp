@@ -352,3 +352,5 @@
   }
   .menu-pop a:hover{ background:var(--accent-soft); }
   .menu-pop a[aria-current="page"]{ color:var(--accent); font-weight:600; }
+  /* The global svg rule rotates the timer ring; keep the menu icon upright. */
+  .menu-btn svg{ width:20px; height:20px; transform:none; }
