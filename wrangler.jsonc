@@ -1,0 +1,9 @@
+{
+  // Cloudflare Workers static-assets config for Mindful Joy (mindfuljoy.app).
+  // The site is plain static files, so there is no Worker script, only assets.
+  "name": "gentle-mountain-87c6",
+  "compatibility_date": "2026-10-06",
+  "assets": {
+    "directory": "./"
+  }
+}

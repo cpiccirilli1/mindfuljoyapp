@@ -1,0 +1,3 @@
+# Files in the repo root that should not be served on the live site
+wrangler.jsonc
+.assetsignore
