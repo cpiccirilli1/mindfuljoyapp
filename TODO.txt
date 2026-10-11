@@ -39,7 +39,7 @@ SITE / OPS
 [x] Change "Meditation Timer (mindfuljoy.app)" to "Mindful Joy" in the
     About, Privacy, and Terms body text
 [x] Hamburger menu layout: under the title, or beside it (beside, done)
-[ ] Update README (old name and file list; add Articles page, menu,
+[x] Update README (old name and file list; add Articles page, menu,
     consent banner, wrangler.jsonc)
 [ ] After AdSense approval: place ad units on content pages only
 [ ] When articles are published: remove noindex from articles.html and

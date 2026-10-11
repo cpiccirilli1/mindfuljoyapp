@@ -1,22 +1,42 @@
-# Meditation Timer (mindfuljoy.app) - export package
+# Mindful Joy (mindfuljoy.app)
 
-A fully static website: plain HTML, CSS and JavaScript. There is no server code, database, or build step.
+A free meditation timer, breathing pacer and reflection tool. It is a fully static website: plain HTML, CSS and
+JavaScript, with no server code, database or build step. Open source under the MIT License.
+
+## Features
+
+- **Timer:** 5 to 60 minute sessions, a custom length, or a **sit and walk sequence** made of up to 12 segments
+  (each Sit or Walk, 1 to 120 minutes) with presets, saved layouts and a bell between segments.
+- **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
+  bell (repeating or custom times), volume, and a preparation delay.
+- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts.
+- **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
+  wake lock during sessions.
+- Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates note, and a
+  cookie notice.
 
 ## Files
 
 ```
 index.html            Timer, Breathe and Reflect tools
+articles.html         Articles page (placeholder for now, set to noindex)
 about.html            About page (features, credits and licenses)
 privacy.html          Privacy Policy
 terms.html            Terms of Service
 ads.txt               Google AdSense publisher line (keep the filename lowercase) (pub-8467685368663778)
 robots.txt            Search engine rules (points to the sitemap)
-sitemap.xml           The four pages, using https://mindfuljoy.app
+sitemap.xml           The public pages, using https://mindfuljoy.app
+wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
+.assetsignore         Repo files that Cloudflare should NOT publish on the site
+LICENSE               MIT License
+TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
-  js/app.js           Timer, bells, breathing pacer, settings (index.html only)
-  js/site.js          Theme menu and Back to top button for the About, Privacy and Terms pages
+  js/app.js           Timer, sit/walk sequences, bells, breathing pacer, settings (index.html only)
+  js/menu.js          Header menu button and the updates note (every page)
+  js/consent.js       Cookie notice banner (every page)
+  js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon
@@ -24,8 +44,20 @@ assets/
 
 ## Deploying
 
-Upload the contents of this folder to the root of any static host (Netlify, Cloudflare Pages, GitHub Pages,
-Vercel, an S3 bucket, or ordinary web hosting) and point mindfuljoy.app at it. Serve it over HTTPS.
+The live site is a Cloudflare Workers project (`gentle-mountain-87c6`) that builds from this GitHub repository
+and serves the repository root as static assets, on https://mindfuljoy.app.
+
+- **`main` branch:** every push to `main` goes live on mindfuljoy.app.
+- **Other branches (for example `dev`):** every push builds a preview at its own address, found in the
+  Cloudflare dashboard under the project's Deployments. The live site is not touched.
+- **Suggested workflow:** make changes on `dev`, check the preview, then merge `dev` into `main` to publish.
+
+`wrangler.jsonc` holds the Worker name, a compatibility date, the assets folder (`./`) and an empty `previews`
+block, which the non-production deploy command (`npx wrangler preview`) requires. `.assetsignore` keeps
+`wrangler.jsonc`, itself and `TODO.txt` off the live site. Note that `README.md` and `LICENSE` are published
+along with everything else.
+
+The files can also be uploaded to any other static host. Serve them over HTTPS.
 
 To test on your computer, run `python3 -m http.server` inside this folder and open http://localhost:8000.
 Opening index.html by double-clicking (a file:// address) works, but browsers block loading the bell audio
@@ -33,19 +65,30 @@ that way, so the app falls back to simple synthesized tones. Use a local server 
 
 ## Google AdSense
 
-The AdSense loader script (publisher ca-pub-8467685368663778) is already in the `<head>` of every page, and
-`ads.txt` contains your publisher line. Search the files for `ADSENSE AD SLOT` to find the comments that mark
-where to paste ad units once you create them in AdSense:
+The AdSense loader script (publisher ca-pub-8467685368663778) is in the `<head>` of every page, and
+`ads.txt` contains the publisher line. Search the files for `ADSENSE AD SLOT` to find the comments that mark
+where to paste ad units once they are created in AdSense:
 
 1. `index.html`: AD SLOT 1, below the tools and above the footer.
 2. `about.html`, `privacy.html`, `terms.html`: an ad slot at the end of the article.
 
-The About, Privacy and Terms pages already disclose that the site uses advertising (Google AdSense, cookies,
-and opt-out links). If you serve visitors in the EEA, UK or Switzerland, also turn on a consent message in
-your AdSense account (Privacy & messaging) so personalized ads are only served with consent. Re-read the
-Privacy Policy if you add other services later, such as analytics.
+Plans: after approval, place ad units on content pages only, and keep them clear of the play, pause and reset
+buttons so they are not tapped by accident. The Privacy Policy and Terms already disclose advertising.
 
-Keep ads clear of the play, pause and reset buttons so they are not tapped by accident.
+**Cookie notice.** `assets/js/consent.js` shows a banner on every page until the visitor chooses Accept (the
+choice is saved in the browser and the banner stops appearing) or Reject (the visitor is sent to google.com).
+It is a notice only: the AdSense script still loads on every page. After AdSense approves the site, replace it
+with AdSense's own consent message (AdSense, Privacy & messaging), which is the tool meant for visitors in the
+EEA, UK and Switzerland, and update Privacy Policy section 5 to match.
+
+**Articles.** `articles.html` is a placeholder with `noindex`. When real articles are published, remove the
+`noindex` tag and add the pages to `sitemap.xml`.
+
+## Header menu and updates note
+
+`assets/js/menu.js` builds the menu from the `PAGES` list at the top of the file, so a new page is one line.
+The updates note beside the title is set by the `UPDATE` object in the same file (`text`, `href`, `linkText`).
+It shows on every page load, and its close button only hides it until the next load.
 
 ## Color themes
 
@@ -66,8 +109,10 @@ Third-party assets keep their own licenses:
 
 ## Notes
 
-- Visitors' settings are saved in their own browser (localStorage). Nothing is sent to a server.
-- The only outside request the pages make is the Inter font from Google Fonts. To remove it, self-host
-  the font and delete the Google Fonts `<link>` tags.
+- Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
+  current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
+  Nothing is sent to a server by the site itself.
+- Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
+  request, self-host the font and delete the Google Fonts `<link>` tags.
 - The Ko-fi link and contact email are set in the Donations button (every page header) and in about.html,
   privacy.html and terms.html.
