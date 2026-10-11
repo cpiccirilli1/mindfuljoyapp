@@ -328,3 +328,27 @@
   .to-top:hover{ background:var(--accent-soft); }
   .to-top:active{ transform:scale(.94); }
   .to-top svg{ width:20px; height:20px; transform:none; }
+
+  /* ---------- Brand block + hamburger menu ---------- */
+  .brand{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; min-width:0; }
+  .nav-menu{ position:relative; }
+  .menu-btn{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:40px; height:40px; border-radius:10px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .2s, color .2s, transform .2s;
+  }
+  .menu-btn:hover, .menu-btn[aria-expanded="true"]{ color:var(--text); border-color:var(--accent); }
+  .menu-btn:active{ transform:scale(.94); }
+  .menu-pop{
+    position:absolute; top:calc(100% + 8px); left:0; z-index:30; min-width:210px;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:2px;
+  }
+  .menu-pop[hidden]{ display:none; }
+  .menu-pop a{
+    display:block; padding:11px 14px; border-radius:8px; color:var(--text);
+    font-size:.95rem; text-decoration:none; min-height:44px; box-sizing:border-box;
+  }
+  .menu-pop a:hover{ background:var(--accent-soft); }
+  .menu-pop a[aria-current="page"]{ color:var(--accent); font-weight:600; }
