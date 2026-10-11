@@ -690,16 +690,17 @@
       mins.setAttribute('aria-label', 'Segment ' + (i+1) + ' minutes');
       const unit = document.createElement('span');
       unit.className = 'seg-unit'; unit.textContent = 'min';
-      const mk = (cls, label, html, disabled)=>{
+      const mk = (cls, label, tip, html, disabled)=>{
         const b = document.createElement('button');
         b.type = 'button'; b.className = 'seg-btn ' + cls; b.setAttribute('aria-label', label + ' segment ' + (i+1));
+        b.title = tip;  // short hover tooltip
         b.innerHTML = html; b.disabled = !!disabled;
         return b;
       };
       li.append(num, type, mins, unit,
-        mk('seg-up', 'Move up', '&#9650;', i === 0),
-        mk('seg-down', 'Move down', '&#9660;', i === segments.length-1),
-        mk('seg-remove', 'Remove', '&times;', segments.length === 1));
+        mk('seg-up', 'Move up', 'Move up', '&#9650;', i === 0),
+        mk('seg-down', 'Move down', 'Move down', '&#9660;', i === segments.length-1),
+        mk('seg-remove', 'Remove', 'Delete', '&times;', segments.length === 1));
       segList.appendChild(li);
     });
     seqTotal.textContent = Math.round(seqTotalSeconds()/60) + ' min total';
