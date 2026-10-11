@@ -434,3 +434,4 @@
     .seg-unit{ display:none; }
   }
   .num-input:disabled{ opacity:.5; cursor:not-allowed; }
+  .menu-sep{ border:0; border-top:1px solid var(--border); margin:6px 8px; }

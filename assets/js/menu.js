@@ -40,6 +40,12 @@
   pop.hidden = true;
   pop.setAttribute('aria-label', 'Main menu');
   PAGES.forEach(function (p) {
+    // Divider between the main content pages and the site information pages.
+    if (p.href === 'about.html') {
+      var hr = document.createElement('hr');
+      hr.className = 'menu-sep';
+      pop.appendChild(hr);
+    }
     var a = document.createElement('a');
     a.href = p.href;
     a.textContent = p.label;
