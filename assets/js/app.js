@@ -7,14 +7,13 @@
     if(m===20) opt.selected = true;
     durationSelect.appendChild(opt);
   }
-  [['sequence','Sit + walk'],['custom','Custom length'],['open','Open-ended (count up)']].forEach(([v,t])=>{
+  [['sequence','Sit + walk'],['custom','Custom length']].forEach(([v,t])=>{
     const opt = document.createElement('option');
     opt.value = v; opt.textContent = t;
     durationSelect.appendChild(opt);
   });
   const customLenRow = document.getElementById('customLenRow');
   const customLenInput = document.getElementById('customLenInput');
-  const openNote = document.getElementById('openNote');
   const intervalEvery = document.getElementById('intervalEvery');
   for(let m=1; m<=30; m++){
     const opt = document.createElement('option');
@@ -33,7 +32,6 @@
   let tickHandle = null;
   let triggered = new Set();
   let customTimes = []; // minutes
-  let openEnded = false;
   let storeReady = false; // true once saved settings have been loaded
 
   const settings = { startEnabled:true, endEnabled:true, intervalEnabled:false, mode:'regular', prepSeconds:5, bellSound:'bowl', startCount:1, endCount:1, segEnabled:true, segCount:1, volume:1 };
@@ -196,12 +194,11 @@
     if(!settings.intervalEnabled) return pts;
     if(settings.mode === 'regular'){
       const step = Number(intervalEvery.value) * 60;
-      const limit = openEnded ? 21600 : totalSeconds;
-      for(let t=step; t<limit; t+=step) pts.push(t);
+      for(let t=step; t<totalSeconds; t+=step) pts.push(t);
     } else {
       customTimes.forEach(m=>{
         const t = m*60;
-        if(t>0 && (openEnded || t<totalSeconds)) pts.push(t);
+        if(t>0 && t<totalSeconds) pts.push(t);
       });
     }
     return pts.sort((a,b)=>a-b);
@@ -260,8 +257,6 @@
   // ---------- Timer control ----------
   function readLength(){
     const v = durationSelect.value;
-    if(v === 'open'){ openEnded = true; totalSeconds = 0; return; }
-    openEnded = false;
     if(v === 'sequence'){ totalSeconds = seqTotalSeconds(); return; }
     if(v === 'custom'){
       let m = Math.round(Number(customLenInput.value));
@@ -274,15 +269,11 @@
   }
   function renderIdle(){
     phaseTotal = totalSeconds;
-    if(openEnded){ timeDisplay.textContent = '00:00'; ring.style.strokeDashoffset = CIRC; }
-    else render(totalSeconds);
+    render(totalSeconds);
     if(isSeq()) renderSeqIdle();
   }
   function renderSession(elapsed){
-    if(openEnded){
-      timeDisplay.textContent = fmt(elapsed);
-      ring.style.strokeDashoffset = CIRC * (1 - ((elapsed % 60) / 60));
-    } else if(isSeq()){
+    if(isSeq()){
       renderSeq(elapsed);
     } else {
       render(phaseTotal - elapsed);
@@ -304,17 +295,6 @@
 
   function tick(){
     const elapsed = (Date.now() - phaseStartTimestamp)/1000;
-    if(phase === 'session' && openEnded){
-      renderSession(elapsed);
-      triggerPoints().forEach(pt=>{
-        if(!triggered.has(pt) && elapsed >= pt){
-          triggered.add(pt);
-          playBell('interval');
-          announce('Interval bell');
-        }
-      });
-      return;
-    }
     const remaining = phaseTotal - elapsed;
     if(remaining <= 0){
       if(phase === 'prep'){ beginSession(); return; }
@@ -346,7 +326,7 @@
 
   function beginSession(){
     phase = 'session';
-    phaseTotal = openEnded ? Infinity : totalSeconds;
+    phaseTotal = totalSeconds;
     phasePausedElapsed = 0;
     phaseStartTimestamp = Date.now();
     triggered.clear();
@@ -374,7 +354,7 @@
         announce('Starting in ' + settings.prepSeconds + ' seconds');
       } else {
         phase = 'session';
-        phaseTotal = openEnded ? Infinity : totalSeconds;
+        phaseTotal = totalSeconds;
         triggered.clear();
         lastSeg = 0;
         playBell('start');
@@ -441,7 +421,6 @@
   resetBtn.addEventListener('click', reset);
   function syncLengthUI(){
     customLenRow.hidden = durationSelect.value !== 'custom';
-    openNote.hidden = durationSelect.value !== 'open';
     seqEditor.hidden = !isSeq();
     segStatus.hidden = !isSeq();
   }
