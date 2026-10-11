@@ -5,5 +5,7 @@
   "compatibility_date": "2026-10-06",
   "assets": {
     "directory": "./"
-  }
+  },
+  // Required by `wrangler preview` (used for non-production branch builds). Can stay empty.
+  "previews": {}
 }
