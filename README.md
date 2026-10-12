@@ -12,8 +12,8 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts.
 - **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
   wake lock during sessions.
-- Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates note, and a
-  cookie notice.
+- Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates strip under the
+  header, and a cookie notice.
 
 ## Files
 
@@ -34,7 +34,7 @@ assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
   js/app.js           Timer, sit/walk sequences, bells, breathing pacer, settings (index.html only)
-  js/menu.js          Header menu button and the updates note (every page)
+  js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   audio/*.mp3         Five CC0 bell recordings
@@ -84,11 +84,11 @@ EEA, UK and Switzerland, and update Privacy Policy section 5 to match.
 **Articles.** `articles.html` is a placeholder with `noindex`. When real articles are published, remove the
 `noindex` tag and add the pages to `sitemap.xml`.
 
-## Header menu and updates note
+## Header menu and updates strip
 
 `assets/js/menu.js` builds the menu from the `PAGES` list at the top of the file, so a new page is one line.
-The updates note beside the title is set by the `UPDATE` object in the same file (`text`, `href`, `linkText`).
-It shows on every page load, and its close button only hides it until the next load.
+The updates strip directly under the header is set by the `UPDATE` object in the same file (`text`, `href`,
+`linkText`). It shows on every page load, and its close button only hides it until the next load.
 
 ## Color themes
 

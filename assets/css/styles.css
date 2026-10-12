@@ -333,7 +333,6 @@
   .brand{ display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:12px; row-gap:8px; align-items:center; min-width:0; }
   .brand .nav-menu{ grid-column:1; grid-row:1; }
   .brand .mark{ grid-column:2; grid-row:1; }
-  .brand .update-note{ grid-column:2; grid-row:2; justify-self:start; max-width:100%; }
   .nav-menu{ position:relative; }
   .menu-btn{
     background:none; border:1px solid var(--border); color:var(--text-dim);
@@ -359,15 +358,17 @@
   .menu-btn svg{ width:20px; height:20px; transform:none; }
 
   /* ---------- Brand row + updates note ---------- */
-  .update-note{
-    display:flex; align-items:center; gap:6px; min-width:0;
-    background:var(--accent-soft); border:1px solid var(--border); border-radius:10px;
-    padding:6px 6px 6px 10px; font-size:.78rem; line-height:1.35; color:var(--text);
+  /* Full-width strip directly under the header. Its negative top margin cancels the header's bottom margin. */
+  .update-strip{
+    position:relative; align-self:stretch;
+    margin:-28px -20px 28px; padding:10px 48px 10px 20px;
+    background:var(--accent-soft); color:var(--text); border-bottom:1px solid var(--border);
+    font-size:.85rem; line-height:1.4; text-align:center;
   }
   .update-text{ min-width:0; }
   .update-text a{ color:var(--accent); font-weight:500; white-space:nowrap; }
   .update-close{
-    flex:none; width:28px; height:28px; border:none; border-radius:50%; background:none;
+    position:absolute; right:10px; top:50%; transform:translateY(-50%); width:32px; height:32px; border:none; border-radius:50%; background:none;
     color:var(--text-dim); font-size:1.2rem; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
   }
@@ -435,3 +436,9 @@
   }
   .num-input:disabled{ opacity:.5; cursor:not-allowed; }
   .menu-sep{ border:0; border-top:1px solid var(--border); margin:6px 8px; }
+  /* Keep the strip aligned with the header's margins at each size. */
+  .update-strip{
+    margin-left:calc(-1 * max(20px, env(safe-area-inset-left, 0px)));
+    margin-right:calc(-1 * max(20px, env(safe-area-inset-right, 0px)));
+  }
+  @media (max-width:600px){ .update-strip{ margin-top:-22px; margin-bottom:22px; } }

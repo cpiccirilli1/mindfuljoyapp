@@ -57,10 +57,10 @@
   wrap.appendChild(btn);
   wrap.appendChild(pop);
 
-  // Layout: menu button to the left of the title; the "updates" note sits under the title.
+  // Layout: menu button to the left of the title; the "updates" strip sits directly under the header.
   brand.insertBefore(wrap, mark);
 
-  // The note shows on every page load. The close button hides it only until the
+  // The strip shows on every page load. The close button hides it only until the
   // next page load or refresh; nothing is saved on the device.
   var UPDATE = {
     text: 'New: Articles coming soon.',
@@ -68,7 +68,7 @@
     linkText: 'Details'
   };
   var note = document.createElement('div');
-  note.className = 'update-note';
+  note.className = 'update-strip';
   note.setAttribute('role', 'status');
   var msg = document.createElement('span');
   msg.className = 'update-text';
@@ -88,7 +88,7 @@
   });
   note.appendChild(msg);
   note.appendChild(x);
-  brand.appendChild(note);
+  mark.closest('.topbar').after(note);
 
   function setOpen(open, returnFocus) {
     pop.hidden = !open;
