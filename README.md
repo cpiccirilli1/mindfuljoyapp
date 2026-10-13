@@ -9,7 +9,7 @@ JavaScript, with no server code, database or build step. Open source under the M
   (each Sit or Walk, 1 to 120 minutes) with presets, saved layouts and a bell between segments.
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
   bell (repeating or custom times), volume, and a preparation delay.
-- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts. **More ▾:** a menu of extra timers, starting with Pomodoro.
+- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts. **More ▾:** a menu of extra timers, Pomodoro and Count Up.
 - **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
   wake lock during sessions.
 - Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates strip under the
@@ -18,7 +18,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 ## Files
 
 ```
-index.html            Timer, Breathe, Reflect and Pomodoro tools
+index.html            Timer, Breathe, Reflect, Pomodoro and Count Up tools
 articles.html         Articles page (placeholder for now, set to noindex)
 about.html            About page (features, credits and licenses)
 privacy.html          Privacy Policy
@@ -33,7 +33,7 @@ TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
-  js/app.js           Timer, sit/walk sequences, bells, breathing pacer, Pomodoro, settings (index.html only)
+  js/app.js           Timer, sit/walk sequences, bells, breathing pacer, Pomodoro, Count Up, settings (index.html only)
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages

@@ -338,7 +338,7 @@
   }
 
   function play(){
-    pPause();
+    pPause(); cuPause();
     ensureAudio();
     acquireWake();
     if(phase === 'idle') readLength();
@@ -544,20 +544,21 @@
   renderChips();
 
   // ---------- Tabs ----------
-  const tabBtns = { timer: document.getElementById('tabBtnTimer'), breathe: document.getElementById('tabBtnBreathe'), reflect: document.getElementById('tabBtnReflect'), pomodoro: document.getElementById('moreBtn') };
-  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect'), pomodoro: document.getElementById('panel-pomodoro') };
+  const tabBtns = { timer: document.getElementById('tabBtnTimer'), breathe: document.getElementById('tabBtnBreathe'), reflect: document.getElementById('tabBtnReflect') };
+  const moreBtn = document.getElementById('moreBtn');
+  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect'), pomodoro: document.getElementById('panel-pomodoro'), countup: document.getElementById('panel-countup') };
   function showTab(name){
     Object.keys(tabPanels).forEach(k=>{
       tabPanels[k].classList.toggle('active', k===name);
-      tabBtns[k].classList.toggle('active', k===name);
-      if(k !== 'pomodoro') tabBtns[k].setAttribute('aria-pressed', String(k===name));
+      if(tabBtns[k]){ tabBtns[k].classList.toggle('active', k===name); tabBtns[k].setAttribute('aria-pressed', String(k===name)); }
     });
+    moreBtn.classList.toggle('active', name === 'pomodoro' || name === 'countup');
     if(name !== 'breathe') stopBreathing();
   }
-  Object.keys(tabBtns).forEach(k=>{ if(k !== 'pomodoro') tabBtns[k].addEventListener('click', ()=>{ closeMore(); showTab(k); }); });
+  Object.keys(tabBtns).forEach(k=>{ tabBtns[k].addEventListener('click', ()=>{ closeMore(); showTab(k); }); });
 
   // ---------- "More timers" menu ----------
-  const moreBtn = tabBtns.pomodoro, morePop = document.getElementById('morePop');
+  const morePop = document.getElementById('morePop');
   function openMore(){ morePop.hidden = false; moreBtn.setAttribute('aria-expanded','true'); const f = morePop.querySelector('.more-item'); if(f) f.focus(); }
   function closeMore(refocus){ if(morePop.hidden) return; morePop.hidden = true; moreBtn.setAttribute('aria-expanded','false'); if(refocus) moreBtn.focus(); }
   moreBtn.addEventListener('click', ()=>{ morePop.hidden ? openMore() : closeMore(); });
@@ -573,6 +574,7 @@
     focus: document.getElementById('pomoFocus'), short: document.getElementById('pomoShort'), long: document.getElementById('pomoLong'),
     rounds: document.getElementById('pomoRounds'), auto: document.getElementById('pomoAuto') };
   pEl.ring.style.strokeDasharray = CIRC;
+  let cuRunning = false, cuStart = 0, cuElapsed = 0, cuHandle = null, cuLastChime = 0; // Count Up state (declared early; used by shared helpers)
   let pPlan = [], pIdx = 0, pRunning = false, pStart = 0, pPaused = 0, pHandle = null, pStarted = false;
 
   function buildPlan(){
@@ -593,10 +595,11 @@
     pEl.phase.textContent = !pRunning && pStarted && pPaused > 0 ? 'Paused' : P_NAME[cur.kind];
     pEl.round.textContent = 'Round ' + cur.round + ' of ' + pPlan.filter(x=>x.kind==='focus').length;
   }
+  function updateLive(){ moreBtn.classList.toggle('live', pRunning || cuRunning); }
   function pLock(){
     const lock = pStarted;
     [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=>{ e.disabled = lock; });
-    moreBtn.classList.toggle('live', pRunning);
+    updateLive();
   }
   function pSetButtons(){
     pEl.play.innerHTML = pRunning ? '&#10074;&#10074;' : '&#9654;';
@@ -637,6 +640,7 @@
   }
   function pPlay(){
     if(isRunning) pause();
+    cuPause();
     stopBreathing();
     ensureAudio(); acquireWake();
     if(!pStarted){ pStarted = true; playBell('start'); pPaused = 0; }
@@ -649,15 +653,66 @@
     if(!pRunning) return;
     pRunning = false; pPaused = (Date.now() - pStart) / 1000;
     clearInterval(pHandle); pHandle = null;
-    if(!isRunning) releaseWake();
+    if(!isRunning && !cuRunning) releaseWake();
     announce('Paused'); pRender(pPlan[pIdx].secs - pPaused); pSetButtons();
   }
-  function pReset(){ stopBells(); if(!isRunning) releaseWake(); pIdle(); announce('Pomodoro reset'); }
+  function pReset(){ stopBells(); if(!isRunning && !cuRunning) releaseWake(); pIdle(); announce('Pomodoro reset'); }
   pEl.play.addEventListener('click', ()=>{ pRunning ? pPause() : pPlay(); });
   pEl.reset.addEventListener('click', pReset);
   pEl.skip.addEventListener('click', ()=>{ if(pStarted) pAdvance(false); });
   [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=> e.addEventListener('change', ()=>{ if(!pStarted) pIdle(); }));
   pIdle();
+
+
+  // ---------- Count Up (open-ended stopwatch) ----------
+  const cuEl = { time: document.getElementById('cuTime'), phase: document.getElementById('cuPhase'), ring: document.getElementById('cuRing'),
+    play: document.getElementById('cuPlay'), reset: document.getElementById('cuReset'), chime: document.getElementById('cuChime') };
+  cuEl.ring.style.strokeDasharray = CIRC;
+  function cuRender(){
+    const s = Math.floor(cuElapsed);
+    cuEl.time.textContent = fmt(s);
+    cuEl.ring.style.strokeDashoffset = CIRC * (1 - (cuElapsed % 60) / 60);
+    cuEl.phase.textContent = cuRunning ? 'Sitting' : (cuElapsed > 0 ? 'Paused' : 'Ready');
+  }
+  function cuButtons(){
+    cuEl.play.innerHTML = cuRunning ? '&#10074;&#10074;' : '&#9654;';
+    cuEl.play.setAttribute('aria-label', cuRunning ? 'Pause Count Up' : (cuElapsed > 0 ? 'Resume Count Up' : 'Start Count Up'));
+    updateLive();
+  }
+  function cuTick(){
+    cuElapsed = (Date.now() - cuStart) / 1000;
+    const every = +cuEl.chime.value * 60;
+    if(every > 0){
+      const n = Math.floor(cuElapsed / every);
+      if(n > cuLastChime){ cuLastChime = n; playBell('interval'); }
+    }
+    cuRender();
+  }
+  function cuPlay(){
+    if(isRunning) pause();
+    pPause(); stopBreathing();
+    ensureAudio(); acquireWake();
+    if(cuElapsed === 0){ playBell('start'); cuLastChime = 0; }
+    cuRunning = true; cuStart = Date.now() - cuElapsed * 1000;
+    clearInterval(cuHandle); cuHandle = setInterval(cuTick, 200);
+    announce(cuElapsed > 0 ? 'Resumed' : 'Count up started');
+    cuButtons(); cuTick();
+  }
+  function cuPause(){
+    if(!cuRunning) return;
+    cuElapsed = (Date.now() - cuStart) / 1000; cuRunning = false;
+    clearInterval(cuHandle); cuHandle = null;
+    if(!isRunning && !pRunning) releaseWake();
+    announce('Paused ' + fmt(cuElapsed)); cuRender(); cuButtons();
+  }
+  function cuReset(){
+    cuRunning = false; clearInterval(cuHandle); cuHandle = null; cuElapsed = 0; cuLastChime = 0;
+    stopBells(); if(!isRunning && !pRunning) releaseWake();
+    announce('Count up reset'); cuRender(); cuButtons();
+  }
+  cuEl.play.addEventListener('click', ()=>{ cuRunning ? cuPause() : cuPlay(); });
+  cuEl.reset.addEventListener('click', cuReset);
+  cuRender(); cuButtons();
 
   // ---------- Breathing pacer ----------
   const PATTERNS = {
@@ -701,7 +756,7 @@
     breathStep();
   }
   function stopBreathing(){
-    if(!isRunning && !pRunning) releaseWake();
+    if(!isRunning && !pRunning && !cuRunning) releaseWake();
     breathRunning = false;
     if(breathTimer){ clearTimeout(breathTimer); breathTimer = null; }
     patternSelect.disabled = false; cyclesSelect.disabled = false;
@@ -939,6 +994,11 @@
       else if(e.key === 'r' || e.key === 'R'){ pReset(); }
       return;
     }
+    if(tabPanels.countup.classList.contains('active')){
+      if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); cuRunning ? cuPause() : cuPlay(); }
+      else if(e.key === 'r' || e.key === 'R'){ cuReset(); }
+      return;
+    }
     if(!tabPanels.timer.classList.contains('active')) return;
     if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); isRunning ? pause() : play(); }
     else if(e.key === 'r' || e.key === 'R'){ reset(); }
@@ -962,7 +1022,8 @@
         pattern: patternSelect.value, cycles: cyclesSelect.value,
         segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: segments,
         pomoFocus: $('pomoFocus').value, pomoShort: $('pomoShort').value, pomoLong: $('pomoLong').value,
-        pomoRounds: $('pomoRounds').value, pomoAuto: $('pomoAuto').checked
+        pomoRounds: $('pomoRounds').value, pomoAuto: $('pomoAuto').checked,
+        cuChime: $('cuChime').value
       }));
     }catch(e){}
   }
@@ -999,7 +1060,7 @@
       setVal('patternSelect', d.pattern); setVal('cyclesSelect', d.cycles);
       setVal('segEnabled', d.segEnabled); setVal('segCount', d.segCount);
       setVal('pomoFocus', d.pomoFocus); setVal('pomoShort', d.pomoShort); setVal('pomoLong', d.pomoLong);
-      setVal('pomoRounds', d.pomoRounds); setVal('pomoAuto', d.pomoAuto);
+      setVal('pomoRounds', d.pomoRounds); setVal('pomoAuto', d.pomoAuto); setVal('cuChime', d.cuChime);
       const saved = cleanSegments(d.segments);
       if(saved){ segments = saved; renderSegments(); }
     }

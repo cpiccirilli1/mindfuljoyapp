@@ -49,6 +49,7 @@
     <div class="more-pop" id="morePop" role="menu" aria-label="More timers" hidden>
       <p class="more-lead">Looking for another timer?</p>
       <button type="button" class="more-item" role="menuitem" data-open="pomodoro"><strong>Pomodoro</strong><span>Focus sprints with short breaks</span></button>
+      <button type="button" class="more-item" role="menuitem" data-open="countup"><strong>Count Up</strong><span>Open-ended, counts time as you sit</span></button>
       <p class="more-soon">More timers coming soon.</p>
     </div>
   </div>
@@ -191,6 +192,32 @@
     <button class="btn reset-btn" id="pomoSkip" aria-label="Skip to next phase" title="Skip">&#9197;&#xFE0E;</button>
   </div>
   <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; Bells follow your Bell Settings (segment change bell)</p>
+</section>
+
+<section class="tab-panel" id="panel-countup">
+  <div class="ring-wrap">
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="track" cx="110" cy="110" r="100"></circle>
+      <circle class="progress" id="cuRing" cx="110" cy="110" r="100"></circle>
+    </svg>
+    <div class="ring-center">
+      <div class="time" id="cuTime">00:00</div>
+      <div class="phase" id="cuPhase">Ready</div>
+    </div>
+  </div>
+  <div class="pomo-grid">
+    <label for="cuChime">Chime every</label>
+    <select id="cuChime">
+      <option value="0" selected>Off</option><option value="1">1 min</option><option value="5">5 min</option>
+      <option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="30">30 min</option>
+    </select>
+  </div>
+  <div class="controls">
+    <button class="btn reset-btn" id="cuReset" aria-label="Reset Count Up" title="Reset">&#8634;</button>
+    <button class="btn play-btn" id="cuPlay" aria-label="Start Count Up">&#9654;</button>
+    <div style="width:52px;"></div>
+  </div>
+  <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; The ring sweeps once a minute</p>
 </section>
 
 <section class="tab-panel" id="panel-reflect">
