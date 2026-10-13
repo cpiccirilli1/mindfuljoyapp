@@ -41,7 +41,7 @@ assets/
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
-  favicon.svg         Site icon (the leaf sprig)
+  favicon.svg         Site icon (the lotus flower)
   icons/              App icons (icon.svg is the source; PNG sizes are rendered from icon-full.svg)
   js/pwa.js           Registers the service worker
 ```

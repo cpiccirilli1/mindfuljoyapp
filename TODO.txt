@@ -26,7 +26,7 @@ FEATURES
     while running, optional longer cycle count
 [ ] Stretch or pose sequencer
 [x] Offline use and "install to home screen" support (PWA)
-    - manifest.webmanifest, sw.js (network first), leaf-sprig app icons
+    - manifest.webmanifest, sw.js (network first), lotus app icons
 [ ] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [ ] Share preview image for links (og:image)
 
