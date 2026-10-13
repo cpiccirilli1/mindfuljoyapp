@@ -469,3 +469,10 @@
   }
   .pomo-grid select:disabled{ opacity:.55; }
   #pomoSkip:disabled{ opacity:.4; cursor:default; }
+
+  /* Lotus logo to the right of the site title */
+  .mark a{ display:inline-flex; align-items:center; gap:9px; }
+  .mark-logo{ width:30px; height:30px; flex:none; border-radius:7px; display:block; }
+  @media (max-width:600px){ .mark-logo{ width:26px; height:26px; border-radius:6px; } }
+  /* Long links (such as the GitHub URL on About) wrap instead of widening the page on phones */
+  p a{ overflow-wrap:anywhere; }
