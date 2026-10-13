@@ -16,6 +16,13 @@ FEATURES
 [ ] Session history and streaks, kept on the device
 [ ] Ambient sound options (rain, ocean, etc.)
 [x] Focus / Pomodoro timer (under the "More" menu; room for more timers there)
+    - Focus, short break, long break and rounds are adjustable
+    - Auto-start toggle, skip and reset, bells from Bell Settings
+    - Settings saved on the device
+[ ] More timers for the "More" menu (ideas: interval / HIIT rounds, a
+    simple countdown with a custom label, stretch timer)
+[ ] Pomodoro extras: tally of finished focus rounds, tab title countdown
+    while running, optional longer cycle count
 [ ] Stretch or pose sequencer
 [ ] Offline use and "install to home screen" support (PWA)
 [ ] Share preview image for links (og:image)
@@ -48,4 +55,4 @@ SITE / OPS
 LEARNING JAVASCRIPT
 -------------------
 [ ] Move timer logic into small functions and add a few tests
-[ ] Split app.js (about 680 lines) into separate files by feature
+[ ] Split app.js (about 1010 lines now, Pomodoro included) into separate files by feature
