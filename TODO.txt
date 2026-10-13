@@ -15,7 +15,7 @@ FEATURES
     - Presets for common sit / walk patterns
 [ ] Session history and streaks, kept on the device
 [ ] Ambient sound options (rain, ocean, etc.)
-[ ] Focus / Pomodoro timer
+[x] Focus / Pomodoro timer (under the "More" menu; room for more timers there)
 [ ] Stretch or pose sequencer
 [ ] Offline use and "install to home screen" support (PWA)
 [ ] Share preview image for links (og:image)

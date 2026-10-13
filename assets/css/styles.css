@@ -442,3 +442,30 @@
     margin-right:calc(-1 * max(20px, env(safe-area-inset-right, 0px)));
   }
   @media (max-width:600px){ .update-strip{ margin-top:-22px; margin-bottom:22px; } }
+
+  /* ---- More timers menu + Pomodoro ---- */
+  .more-wrap{ position:relative; flex:1; display:flex; }
+  .more-wrap .more-btn{ width:100%; }
+  .more-btn[aria-expanded="true"], .more-btn.live{ border-color:var(--accent); color:var(--text); }
+  .more-pop{
+    position:absolute; top:calc(100% + 8px); right:0; z-index:30; width:250px;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:4px;
+  }
+  .more-pop[hidden]{ display:none; }
+  .more-lead{ margin:2px 6px 6px; font-size:.78rem; color:var(--text-dim); }
+  .more-item{
+    display:flex; flex-direction:column; gap:2px; text-align:left; width:100%; box-sizing:border-box;
+    background:none; border:0; border-radius:8px; padding:10px 12px; min-height:44px;
+    font-family:inherit; color:var(--text); cursor:pointer;
+  }
+  .more-item:hover, .more-item:focus-visible{ background:var(--accent-soft); }
+  .more-item strong{ font-size:.95rem; font-weight:600; }
+  .more-item span{ font-size:.78rem; color:var(--text-dim); }
+  .more-soon{ margin:6px 6px 2px; font-size:.74rem; color:var(--text-dim); border-top:1px solid var(--border); padding-top:8px; }
+  .pomo-grid{
+    display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px 14px;
+    width:100%; max-width:340px; margin-bottom:24px; color:var(--text-dim); font-size:.9rem;
+  }
+  .pomo-grid select:disabled{ opacity:.55; }
+  #pomoSkip:disabled{ opacity:.4; cursor:default; }

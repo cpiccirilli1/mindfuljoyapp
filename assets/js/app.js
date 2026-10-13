@@ -338,6 +338,7 @@
   }
 
   function play(){
+    pPause();
     ensureAudio();
     acquireWake();
     if(phase === 'idle') readLength();
@@ -543,17 +544,120 @@
   renderChips();
 
   // ---------- Tabs ----------
-  const tabBtns = { timer: document.getElementById('tabBtnTimer'), breathe: document.getElementById('tabBtnBreathe'), reflect: document.getElementById('tabBtnReflect') };
-  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect') };
+  const tabBtns = { timer: document.getElementById('tabBtnTimer'), breathe: document.getElementById('tabBtnBreathe'), reflect: document.getElementById('tabBtnReflect'), pomodoro: document.getElementById('moreBtn') };
+  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect'), pomodoro: document.getElementById('panel-pomodoro') };
   function showTab(name){
     Object.keys(tabPanels).forEach(k=>{
       tabPanels[k].classList.toggle('active', k===name);
       tabBtns[k].classList.toggle('active', k===name);
-      tabBtns[k].setAttribute('aria-pressed', String(k===name));
+      if(k !== 'pomodoro') tabBtns[k].setAttribute('aria-pressed', String(k===name));
     });
     if(name !== 'breathe') stopBreathing();
   }
-  Object.keys(tabBtns).forEach(k=> tabBtns[k].addEventListener('click', ()=>showTab(k)));
+  Object.keys(tabBtns).forEach(k=>{ if(k !== 'pomodoro') tabBtns[k].addEventListener('click', ()=>{ closeMore(); showTab(k); }); });
+
+  // ---------- "More timers" menu ----------
+  const moreBtn = tabBtns.pomodoro, morePop = document.getElementById('morePop');
+  function openMore(){ morePop.hidden = false; moreBtn.setAttribute('aria-expanded','true'); const f = morePop.querySelector('.more-item'); if(f) f.focus(); }
+  function closeMore(refocus){ if(morePop.hidden) return; morePop.hidden = true; moreBtn.setAttribute('aria-expanded','false'); if(refocus) moreBtn.focus(); }
+  moreBtn.addEventListener('click', ()=>{ morePop.hidden ? openMore() : closeMore(); });
+  morePop.addEventListener('click', e=>{
+    const it = e.target.closest('[data-open]'); if(!it) return;
+    closeMore(); showTab(it.dataset.open);
+  });
+  document.addEventListener('click', e=>{ if(!morePop.hidden && !e.target.closest('.more-wrap')) closeMore(); });
+
+  // ---------- Pomodoro ----------
+  const pEl = { time: document.getElementById('pomoTime'), phase: document.getElementById('pomoPhase'), round: document.getElementById('pomoRound'),
+    ring: document.getElementById('pomoRing'), play: document.getElementById('pomoPlay'), reset: document.getElementById('pomoReset'), skip: document.getElementById('pomoSkip'),
+    focus: document.getElementById('pomoFocus'), short: document.getElementById('pomoShort'), long: document.getElementById('pomoLong'),
+    rounds: document.getElementById('pomoRounds'), auto: document.getElementById('pomoAuto') };
+  pEl.ring.style.strokeDasharray = CIRC;
+  let pPlan = [], pIdx = 0, pRunning = false, pStart = 0, pPaused = 0, pHandle = null, pStarted = false;
+
+  function buildPlan(){
+    const f = +pEl.focus.value * 60, sb = +pEl.short.value * 60, lb = +pEl.long.value * 60, n = +pEl.rounds.value;
+    const plan = [];
+    for(let i=0;i<n;i++){
+      plan.push({ kind:'focus', secs:f, round:i+1 });
+      plan.push(i === n-1 ? { kind:'long', secs:lb, round:i+1 } : { kind:'short', secs:sb, round:i+1 });
+    }
+    return plan;
+  }
+  const P_NAME = { focus:'Focus', short:'Short break', long:'Long break' };
+  function pRender(remaining){
+    const cur = pPlan[pIdx];
+    pEl.time.textContent = fmt(remaining);
+    const frac = cur.secs ? Math.max(0, Math.min(1, remaining / cur.secs)) : 0;
+    pEl.ring.style.strokeDashoffset = CIRC * (1 - frac);
+    pEl.phase.textContent = !pRunning && pStarted && pPaused > 0 ? 'Paused' : P_NAME[cur.kind];
+    pEl.round.textContent = 'Round ' + cur.round + ' of ' + pPlan.filter(x=>x.kind==='focus').length;
+  }
+  function pLock(){
+    const lock = pStarted;
+    [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=>{ e.disabled = lock; });
+    moreBtn.classList.toggle('live', pRunning);
+  }
+  function pSetButtons(){
+    pEl.play.innerHTML = pRunning ? '&#10074;&#10074;' : '&#9654;';
+    pEl.play.setAttribute('aria-label', pRunning ? 'Pause Pomodoro' : (pStarted ? 'Resume Pomodoro' : 'Start Pomodoro'));
+    pEl.skip.disabled = !pStarted;
+    pLock();
+  }
+  function pIdle(){
+    pPlan = buildPlan(); pIdx = 0; pPaused = 0; pStarted = false; pRunning = false;
+    clearInterval(pHandle); pHandle = null;
+    pRender(pPlan[0].secs); pSetButtons();
+  }
+  function pTick(){
+    const el = (Date.now() - pStart) / 1000, cur = pPlan[pIdx], rem = cur.secs - el;
+    if(rem <= 0){ pAdvance(true); return; }
+    pRender(rem);
+  }
+  function pSpeak(){ const c = pPlan[pIdx]; announce(P_NAME[c.kind] + ', round ' + c.round + ', ' + Math.round(c.secs/60) + ' minutes'); }
+  // Move to the next phase. fromTimer: phase ended naturally (ring a bell); otherwise it was skipped.
+  function pAdvance(fromTimer){
+    if(pIdx >= pPlan.length - 1){
+      // finished the whole cycle
+      clearInterval(pHandle); pHandle = null; releaseWake();
+      if(fromTimer) playBell('end');
+      announce('Pomodoro cycle complete');
+      pIdle(); pEl.phase.textContent = 'Complete';
+      return;
+    }
+    if(fromTimer) playBell('segment');
+    pIdx++; pPaused = 0;
+    const keepGoing = pRunning && (pEl.auto.checked || !fromTimer);
+    if(keepGoing){ pStart = Date.now(); pSpeak(); pRender(pPlan[pIdx].secs); }
+    else {
+      pRunning = false; clearInterval(pHandle); pHandle = null; releaseWake();
+      pPaused = 0; pRender(pPlan[pIdx].secs); pSpeak();
+    }
+    pSetButtons();
+  }
+  function pPlay(){
+    if(isRunning) pause();
+    stopBreathing();
+    ensureAudio(); acquireWake();
+    if(!pStarted){ pStarted = true; playBell('start'); pPaused = 0; }
+    pRunning = true; pStart = Date.now() - pPaused * 1000;
+    clearInterval(pHandle); pHandle = setInterval(pTick, 200);
+    announce(pPaused > 0 ? 'Resumed' : 'Pomodoro started. ' + P_NAME[pPlan[pIdx].kind]);
+    pSetButtons(); pTick();
+  }
+  function pPause(){
+    if(!pRunning) return;
+    pRunning = false; pPaused = (Date.now() - pStart) / 1000;
+    clearInterval(pHandle); pHandle = null;
+    if(!isRunning) releaseWake();
+    announce('Paused'); pRender(pPlan[pIdx].secs - pPaused); pSetButtons();
+  }
+  function pReset(){ stopBells(); if(!isRunning) releaseWake(); pIdle(); announce('Pomodoro reset'); }
+  pEl.play.addEventListener('click', ()=>{ pRunning ? pPause() : pPlay(); });
+  pEl.reset.addEventListener('click', pReset);
+  pEl.skip.addEventListener('click', ()=>{ if(pStarted) pAdvance(false); });
+  [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=> e.addEventListener('change', ()=>{ if(!pStarted) pIdle(); }));
+  pIdle();
 
   // ---------- Breathing pacer ----------
   const PATTERNS = {
@@ -597,7 +701,7 @@
     breathStep();
   }
   function stopBreathing(){
-    if(!isRunning) releaseWake();
+    if(!isRunning && !pRunning) releaseWake();
     breathRunning = false;
     if(breathTimer){ clearTimeout(breathTimer); breathTimer = null; }
     patternSelect.disabled = false; cyclesSelect.disabled = false;
@@ -822,13 +926,19 @@
   document.addEventListener('keydown', e=>{
     if(e.ctrlKey || e.metaKey || e.altKey) return;
     if(e.key === 'Escape'){
-      if(!themePop.hidden) closeThemeMenu(true);
+      if(!morePop.hidden) closeMore(true);
+      else if(!themePop.hidden) closeThemeMenu(true);
       else if(panel.classList.contains('open')) closePanel();
       return;
     }
     const t = e.target, tag = t && t.tagName;
     if(tag==='INPUT' || tag==='SELECT' || tag==='TEXTAREA' || tag==='BUTTON' || tag==='A' || (t && t.isContentEditable)) return;
     if(panel.classList.contains('open') || document.body.classList.contains('info-open')) return;
+    if(tabPanels.pomodoro.classList.contains('active')){
+      if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); pRunning ? pPause() : pPlay(); }
+      else if(e.key === 'r' || e.key === 'R'){ pReset(); }
+      return;
+    }
     if(!tabPanels.timer.classList.contains('active')) return;
     if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); isRunning ? pause() : play(); }
     else if(e.key === 'r' || e.key === 'R'){ reset(); }
@@ -850,7 +960,9 @@
         intervalEnabled: $('intervalEnabled').checked, mode: settings.mode,
         intervalEvery: intervalEvery.value, customTimes: customTimes,
         pattern: patternSelect.value, cycles: cyclesSelect.value,
-        segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: segments
+        segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: segments,
+        pomoFocus: $('pomoFocus').value, pomoShort: $('pomoShort').value, pomoLong: $('pomoLong').value,
+        pomoRounds: $('pomoRounds').value, pomoAuto: $('pomoAuto').checked
       }));
     }catch(e){}
   }
@@ -886,6 +998,8 @@
       setVal('intervalEnabled', d.intervalEnabled);
       setVal('patternSelect', d.pattern); setVal('cyclesSelect', d.cycles);
       setVal('segEnabled', d.segEnabled); setVal('segCount', d.segCount);
+      setVal('pomoFocus', d.pomoFocus); setVal('pomoShort', d.pomoShort); setVal('pomoLong', d.pomoLong);
+      setVal('pomoRounds', d.pomoRounds); setVal('pomoAuto', d.pomoAuto);
       const saved = cleanSegments(d.segments);
       if(saved){ segments = saved; renderSegments(); }
     }

@@ -44,6 +44,14 @@
   <button class="tab-btn active" id="tabBtnTimer" data-tab="timer" aria-pressed="true">Timer</button>
   <button class="tab-btn" id="tabBtnBreathe" data-tab="breathe" aria-pressed="false">Breathe</button>
   <button class="tab-btn" id="tabBtnReflect" data-tab="reflect" aria-pressed="false">Reflect</button>
+  <div class="more-wrap">
+    <button class="tab-btn more-btn" id="moreBtn" type="button" title="More Timers" aria-haspopup="true" aria-expanded="false" aria-controls="morePop">More <span aria-hidden="true">&#9662;</span></button>
+    <div class="more-pop" id="morePop" role="menu" aria-label="More timers" hidden>
+      <p class="more-lead">Looking for another timer?</p>
+      <button type="button" class="more-item" role="menuitem" data-open="pomodoro"><strong>Pomodoro</strong><span>Focus sprints with short breaks</span></button>
+      <p class="more-soon">More timers coming soon.</p>
+    </div>
+  </div>
 </nav>
 
 <main class="tab-panel active" id="panel-timer">
@@ -142,6 +150,47 @@
   <div class="controls" style="margin-top:14px;">
     <button class="btn play-btn" id="breathPlayBtn" aria-label="Start breathing">&#9654;</button>
   </div>
+</section>
+
+<section class="tab-panel" id="panel-pomodoro">
+  <div class="ring-wrap">
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="track" cx="110" cy="110" r="100"></circle>
+      <circle class="progress" id="pomoRing" cx="110" cy="110" r="100"></circle>
+    </svg>
+    <div class="ring-center">
+      <div class="time" id="pomoTime">25:00</div>
+      <div class="phase" id="pomoPhase">Focus</div>
+    </div>
+  </div>
+  <p class="seg-status" id="pomoRound">Round 1 of 4</p>
+  <div class="pomo-grid">
+    <label for="pomoFocus">Focus</label>
+    <select id="pomoFocus">
+      <option value="15">15 min</option><option value="20">20 min</option><option value="25" selected>25 min</option>
+      <option value="30">30 min</option><option value="45">45 min</option><option value="50">50 min</option>
+    </select>
+    <label for="pomoShort">Short break</label>
+    <select id="pomoShort">
+      <option value="3">3 min</option><option value="5" selected>5 min</option><option value="10">10 min</option>
+    </select>
+    <label for="pomoLong">Long break</label>
+    <select id="pomoLong">
+      <option value="10">10 min</option><option value="15" selected>15 min</option><option value="20">20 min</option><option value="30">30 min</option>
+    </select>
+    <label for="pomoRounds">Rounds</label>
+    <select id="pomoRounds">
+      <option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option>
+    </select>
+    <label for="pomoAuto">Auto-start next phase</label>
+    <label class="switch"><input type="checkbox" id="pomoAuto" checked><span class="slider"></span></label>
+  </div>
+  <div class="controls">
+    <button class="btn reset-btn" id="pomoReset" aria-label="Reset Pomodoro" title="Reset">&#8634;</button>
+    <button class="btn play-btn" id="pomoPlay" aria-label="Start Pomodoro">&#9654;</button>
+    <button class="btn reset-btn" id="pomoSkip" aria-label="Skip to next phase" title="Skip">&#9197;&#xFE0E;</button>
+  </div>
+  <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; Bells follow your Bell Settings (segment change bell)</p>
 </section>
 
 <section class="tab-panel" id="panel-reflect">
