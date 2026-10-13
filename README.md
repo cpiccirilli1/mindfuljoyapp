@@ -26,6 +26,8 @@ terms.html            Terms of Service
 ads.txt               Google AdSense publisher line (keep the filename lowercase) (pub-8467685368663778)
 robots.txt            Search engine rules (points to the sitemap)
 sitemap.xml           The public pages, using https://mindfuljoy.app
+manifest.webmanifest  Web app manifest (name, colors, icons) so the site can be installed
+sw.js                 Service worker: saves the site for offline use (network first; bump CACHE_VERSION to clear old copies)
 wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
 .assetsignore         Repo files that Cloudflare should NOT publish on the site
 LICENSE               MIT License
@@ -39,7 +41,9 @@ assets/
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
-  favicon.svg         Site icon
+  favicon.svg         Site icon (the leaf sprig)
+  icons/              App icons (icon.svg is the source; PNG sizes are rendered from icon-full.svg)
+  js/pwa.js           Registers the service worker
 ```
 
 ## Deploying

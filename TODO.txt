@@ -25,7 +25,9 @@ FEATURES
 [ ] Pomodoro extras: tally of finished focus rounds, tab title countdown
     while running, optional longer cycle count
 [ ] Stretch or pose sequencer
-[ ] Offline use and "install to home screen" support (PWA)
+[x] Offline use and "install to home screen" support (PWA)
+    - manifest.webmanifest, sw.js (network first), leaf-sprig app icons
+[ ] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [ ] Share preview image for links (og:image)
 
 CONTENT
