@@ -502,3 +502,10 @@
     .menu-pop hr.menu-mobile-only{ display:block; }
     .menu-pop a.menu-mobile-only{ display:block; color:var(--accent); font-weight:600; }
   }
+
+  /* Session length drop-down and Bell Settings button: two equal columns, centered under the ring.
+     (With flex:1 the button's padding made it wider than the drop-down, which pushed the drop-down left.) */
+  .options-row{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:end; gap:12px; }
+  .options-row .len-field{ flex:none; }
+  .options-row .settings-btn{ flex:none; width:100%; box-sizing:border-box; padding-left:10px; padding-right:10px; }
+  .options-row select{ box-sizing:border-box; }

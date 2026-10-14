@@ -57,7 +57,7 @@ SITE / OPS
 
 LAYOUT FIXES
 ------------
-[ ] Fix bell settings button and session link drop down centering.
+[x] Fix bell settings button and session link drop down centering.
 
 LEARNING JAVASCRIPT
 -------------------
