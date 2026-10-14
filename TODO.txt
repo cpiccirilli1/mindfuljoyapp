@@ -55,6 +55,10 @@ SITE / OPS
 [ ] When articles are published: remove noindex from articles.html and
     add it to sitemap.xml
 
+LAYOUT FIXES
+------------
+[ ] Fix bell settings button and session link drop down centering.
+
 LEARNING JAVASCRIPT
 -------------------
 [ ] Move timer logic into small functions and add a few tests
