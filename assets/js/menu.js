@@ -54,6 +54,19 @@
     pop.appendChild(a);
   });
 
+  // Phones only (see styles.css): the Donations button moves from the header to the bottom of this menu.
+  var donateSrc = document.getElementById('donateBtn');
+  var sep2 = document.createElement('hr');
+  sep2.className = 'menu-sep menu-mobile-only';
+  pop.appendChild(sep2);
+  var don = document.createElement('a');
+  don.className = 'menu-donate menu-mobile-only';
+  don.href = donateSrc ? donateSrc.href : 'https://ko-fi.com/cpiccirilli';
+  don.target = '_blank';
+  don.rel = 'noopener';
+  don.textContent = 'Donations';
+  pop.appendChild(don);
+
   wrap.appendChild(btn);
   wrap.appendChild(pop);
 

@@ -494,3 +494,11 @@
     .menu-btn{ width:36px; }
     .donate-btn{ padding:6px 9px; font-size:.72rem; }
   }
+
+  /* Donations: header button on desktop; bottom of the hamburger menu on phones */
+  .menu-pop .menu-mobile-only{ display:none; }
+  @media (max-width:600px){
+    .donate-btn{ display:none; }
+    .menu-pop hr.menu-mobile-only{ display:block; }
+    .menu-pop a.menu-mobile-only{ display:block; color:var(--accent); font-weight:600; }
+  }
