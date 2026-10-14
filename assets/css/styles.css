@@ -476,3 +476,21 @@
   @media (max-width:600px){ .mark-logo{ width:26px; height:26px; border-radius:6px; } }
   /* Long links (such as the GitHub URL on About) wrap instead of widening the page on phones */
   p a{ overflow-wrap:anywhere; }
+
+  /* Keep "Mindful Joy" on one line next to the logo, even on narrow phones */
+  .mark a span{ white-space:nowrap; }
+  @media (max-width:600px){
+    .topbar{ gap:8px; padding-left:14px; padding-right:14px; }
+    .brand{ column-gap:8px; }
+    .mark a{ gap:6px; }
+    .top-actions{ gap:6px; }
+    .donate-btn{ padding:6px 12px; font-size:.76rem; }
+  }
+  @media (max-width:340px){
+    .topbar .mark{ font-size:1.02rem; }
+    .mark-logo{ width:22px; height:22px; }
+    .topbar{ gap:4px; padding-left:10px; padding-right:10px; }
+    .topbar .icon-btn{ min-width:36px; }
+    .menu-btn{ width:36px; }
+    .donate-btn{ padding:6px 9px; font-size:.72rem; }
+  }
