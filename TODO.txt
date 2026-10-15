@@ -20,6 +20,7 @@ FEATURES
     - Auto-start toggle, skip and reset, bells from Bell Settings
     - Settings saved on the device
 [x] Count Up timer in the "More" menu (open-ended, optional interval chime)
+[x] Stopwatch in the "More" menu (hundredths, laps with split and total, up to 99)
 [ ] More timers for the "More" menu (ideas: interval / HIIT rounds, a
     simple countdown with a custom label, stretch timer)
 [ ] Pomodoro extras: tally of finished focus rounds, tab title countdown

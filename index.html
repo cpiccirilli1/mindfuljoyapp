@@ -52,6 +52,7 @@
       <p class="more-lead">Looking for another timer?</p>
       <button type="button" class="more-item" role="menuitem" data-open="pomodoro"><strong>Pomodoro</strong><span>Focus sprints with short breaks</span></button>
       <button type="button" class="more-item" role="menuitem" data-open="countup"><strong>Count Up</strong><span>Open-ended, counts time as you sit</span></button>
+      <button type="button" class="more-item" role="menuitem" data-open="stopwatch"><strong>Stopwatch</strong><span>Hundredths and lap times</span></button>
       <p class="more-soon">More timers coming soon.</p>
     </div>
   </div>
@@ -220,6 +221,26 @@
     <div style="width:52px;"></div>
   </div>
   <p class="shortcut-hint">Space: start / pause &middot; R: reset &middot; The ring sweeps once a minute</p>
+</section>
+
+<section class="tab-panel" id="panel-stopwatch">
+  <div class="ring-wrap">
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="track" cx="110" cy="110" r="100"></circle>
+      <circle class="progress" id="swRing" cx="110" cy="110" r="100"></circle>
+    </svg>
+    <div class="ring-center">
+      <div class="time sw-time" id="swTime">00:00.00</div>
+      <div class="phase" id="swPhase">Ready</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn reset-btn" id="swReset" aria-label="Reset Stopwatch" title="Reset">&#8634;</button>
+    <button class="btn play-btn" id="swPlay" aria-label="Start Stopwatch">&#9654;</button>
+    <button class="btn reset-btn sw-lap-btn" id="swLap" aria-label="Record lap" title="Lap" disabled>Lap</button>
+  </div>
+  <p class="shortcut-hint">Space: start / pause &middot; L: lap &middot; R: reset</p>
+  <ol class="lap-list" id="swLaps" aria-label="Laps" hidden></ol>
 </section>
 
 <section class="tab-panel" id="panel-reflect">

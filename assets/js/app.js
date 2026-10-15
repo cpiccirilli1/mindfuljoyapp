@@ -338,7 +338,7 @@
   }
 
   function play(){
-    pPause(); cuPause();
+    pPause(); cuPause(); swPause();
     ensureAudio();
     acquireWake();
     if(phase === 'idle') readLength();
@@ -546,13 +546,13 @@
   // ---------- Tabs ----------
   const tabBtns = { timer: document.getElementById('tabBtnTimer'), breathe: document.getElementById('tabBtnBreathe'), reflect: document.getElementById('tabBtnReflect') };
   const moreBtn = document.getElementById('moreBtn');
-  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect'), pomodoro: document.getElementById('panel-pomodoro'), countup: document.getElementById('panel-countup') };
+  const tabPanels = { timer: document.getElementById('panel-timer'), breathe: document.getElementById('panel-breathe'), reflect: document.getElementById('panel-reflect'), pomodoro: document.getElementById('panel-pomodoro'), countup: document.getElementById('panel-countup'), stopwatch: document.getElementById('panel-stopwatch') };
   function showTab(name){
     Object.keys(tabPanels).forEach(k=>{
       tabPanels[k].classList.toggle('active', k===name);
       if(tabBtns[k]){ tabBtns[k].classList.toggle('active', k===name); tabBtns[k].setAttribute('aria-pressed', String(k===name)); }
     });
-    moreBtn.classList.toggle('active', name === 'pomodoro' || name === 'countup');
+    moreBtn.classList.toggle('active', name === 'pomodoro' || name === 'countup' || name === 'stopwatch');
     if(name !== 'breathe') stopBreathing();
   }
   Object.keys(tabBtns).forEach(k=>{ tabBtns[k].addEventListener('click', ()=>{ closeMore(); showTab(k); }); });
@@ -574,6 +574,7 @@
     focus: document.getElementById('pomoFocus'), short: document.getElementById('pomoShort'), long: document.getElementById('pomoLong'),
     rounds: document.getElementById('pomoRounds'), auto: document.getElementById('pomoAuto') };
   pEl.ring.style.strokeDasharray = CIRC;
+  let swRunning = false, swElapsed = 0; // Stopwatch state (declared early; used by shared helpers)
   let cuRunning = false, cuStart = 0, cuElapsed = 0, cuHandle = null, cuLastChime = 0; // Count Up state (declared early; used by shared helpers)
   let pPlan = [], pIdx = 0, pRunning = false, pStart = 0, pPaused = 0, pHandle = null, pStarted = false;
 
@@ -595,7 +596,9 @@
     pEl.phase.textContent = !pRunning && pStarted && pPaused > 0 ? 'Paused' : P_NAME[cur.kind];
     pEl.round.textContent = 'Round ' + cur.round + ' of ' + pPlan.filter(x=>x.kind==='focus').length;
   }
-  function updateLive(){ moreBtn.classList.toggle('live', pRunning || cuRunning); }
+  // Release the screen wake lock only when nothing is running.
+  function maybeRelease(){ if(!isRunning && !pRunning && !cuRunning && !swRunning) releaseWake(); }
+  function updateLive(){ moreBtn.classList.toggle('live', pRunning || cuRunning || swRunning); }
   function pLock(){
     const lock = pStarted;
     [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=>{ e.disabled = lock; });
@@ -640,7 +643,7 @@
   }
   function pPlay(){
     if(isRunning) pause();
-    cuPause();
+    cuPause(); swPause();
     stopBreathing();
     ensureAudio(); acquireWake();
     if(!pStarted){ pStarted = true; playBell('start'); pPaused = 0; }
@@ -653,10 +656,10 @@
     if(!pRunning) return;
     pRunning = false; pPaused = (Date.now() - pStart) / 1000;
     clearInterval(pHandle); pHandle = null;
-    if(!isRunning && !cuRunning) releaseWake();
+    maybeRelease();
     announce('Paused'); pRender(pPlan[pIdx].secs - pPaused); pSetButtons();
   }
-  function pReset(){ stopBells(); if(!isRunning && !cuRunning) releaseWake(); pIdle(); announce('Pomodoro reset'); }
+  function pReset(){ stopBells(); maybeRelease(); pIdle(); announce('Pomodoro reset'); }
   pEl.play.addEventListener('click', ()=>{ pRunning ? pPause() : pPlay(); });
   pEl.reset.addEventListener('click', pReset);
   pEl.skip.addEventListener('click', ()=>{ if(pStarted) pAdvance(false); });
@@ -690,7 +693,7 @@
   }
   function cuPlay(){
     if(isRunning) pause();
-    pPause(); stopBreathing();
+    pPause(); swPause(); stopBreathing();
     ensureAudio(); acquireWake();
     if(cuElapsed === 0){ playBell('start'); cuLastChime = 0; }
     cuRunning = true; cuStart = Date.now() - cuElapsed * 1000;
@@ -702,17 +705,86 @@
     if(!cuRunning) return;
     cuElapsed = (Date.now() - cuStart) / 1000; cuRunning = false;
     clearInterval(cuHandle); cuHandle = null;
-    if(!isRunning && !pRunning) releaseWake();
+    maybeRelease();
     announce('Paused ' + fmt(cuElapsed)); cuRender(); cuButtons();
   }
   function cuReset(){
     cuRunning = false; clearInterval(cuHandle); cuHandle = null; cuElapsed = 0; cuLastChime = 0;
-    stopBells(); if(!isRunning && !pRunning) releaseWake();
+    stopBells(); maybeRelease();
     announce('Count up reset'); cuRender(); cuButtons();
   }
   cuEl.play.addEventListener('click', ()=>{ cuRunning ? cuPause() : cuPlay(); });
   cuEl.reset.addEventListener('click', cuReset);
   cuRender(); cuButtons();
+
+
+  // ---------- Stopwatch (hundredths of a second, with laps) ----------
+  const swEl = { time: document.getElementById('swTime'), phase: document.getElementById('swPhase'), ring: document.getElementById('swRing'),
+    play: document.getElementById('swPlay'), reset: document.getElementById('swReset'), lap: document.getElementById('swLap'), laps: document.getElementById('swLaps') };
+  swEl.ring.style.strokeDasharray = CIRC;
+  const SW_MAX_LAPS = 99;
+  let swStart = 0, swHandle = null, swLaps = [], swLastLap = 0; // swHandle is a requestAnimationFrame id
+  function fmtSw(ms){
+    ms = Math.max(0, Math.floor(ms));
+    const cs = Math.floor((ms % 1000) / 10), s = Math.floor(ms / 1000) % 60, m = Math.floor(ms / 60000) % 60, h = Math.floor(ms / 3600000);
+    const two = n => String(n).padStart(2, '0');
+    return (h > 0 ? h + ':' : '') + two(m) + ':' + two(s) + '.' + two(cs);
+  }
+  function swRender(){
+    swEl.time.textContent = fmtSw(swElapsed);
+    swEl.ring.style.strokeDashoffset = CIRC * (1 - (swElapsed % 60000) / 60000);
+    swEl.phase.textContent = swRunning ? 'Running' : (swElapsed > 0 ? 'Paused' : 'Ready');
+  }
+  function swButtons(){
+    swEl.play.innerHTML = swRunning ? '&#10074;&#10074;' : '&#9654;';
+    swEl.play.setAttribute('aria-label', swRunning ? 'Pause Stopwatch' : (swElapsed > 0 ? 'Resume Stopwatch' : 'Start Stopwatch'));
+    swEl.lap.disabled = !swRunning || swLaps.length >= SW_MAX_LAPS;
+    updateLive();
+  }
+  function swTick(){ swElapsed = Date.now() - swStart; swRender(); }
+  // Redraw once per screen frame so the hundredths run smoothly; the time itself always comes from the clock.
+  function swLoop(){ swTick(); swHandle = requestAnimationFrame(swLoop); }
+  function swStopLoop(){ if(swHandle !== null){ cancelAnimationFrame(swHandle); swHandle = null; } }
+  function swPlay(){
+    if(isRunning) pause();
+    pPause(); cuPause(); stopBreathing();
+    acquireWake();
+    swRunning = true; swStart = Date.now() - swElapsed;
+    swStopLoop(); swLoop();
+    announce(swElapsed > 0 ? 'Resumed' : 'Stopwatch started');
+    swButtons();
+  }
+  function swPause(){
+    if(!swRunning) return;
+    swElapsed = Date.now() - swStart; swRunning = false;
+    swStopLoop();
+    maybeRelease();
+    announce('Paused ' + fmtSw(swElapsed).replace('.', ' point ')); swRender(); swButtons();
+  }
+  function swRecordLap(){
+    if(!swRunning || swLaps.length >= SW_MAX_LAPS) return;
+    swElapsed = Date.now() - swStart;
+    const lapMs = swElapsed - swLastLap; swLastLap = swElapsed;
+    swLaps.push({ lap: lapMs, total: swElapsed });
+    const li = document.createElement('li');
+    const n = document.createElement('span'); n.className = 'lap-n'; n.textContent = 'Lap ' + swLaps.length;
+    const t = document.createElement('span'); t.className = 'lap-t'; t.textContent = fmtSw(lapMs);
+    const tot = document.createElement('span'); tot.className = 'lap-total'; tot.textContent = fmtSw(swElapsed);
+    li.append(n, t, tot);
+    swEl.laps.prepend(li); swEl.laps.hidden = false;
+    announce('Lap ' + swLaps.length + ', ' + fmtSw(lapMs).replace('.', ' point '));
+    swButtons();
+  }
+  function swReset(){
+    swRunning = false; swStopLoop(); swElapsed = 0; swLastLap = 0; swLaps = [];
+    swEl.laps.textContent = ''; swEl.laps.hidden = true;
+    maybeRelease();
+    announce('Stopwatch reset'); swRender(); swButtons();
+  }
+  swEl.play.addEventListener('click', ()=>{ swRunning ? swPause() : swPlay(); });
+  swEl.reset.addEventListener('click', swReset);
+  swEl.lap.addEventListener('click', swRecordLap);
+  swRender(); swButtons();
 
   // ---------- Breathing pacer ----------
   const PATTERNS = {
@@ -756,7 +828,7 @@
     breathStep();
   }
   function stopBreathing(){
-    if(!isRunning && !pRunning && !cuRunning) releaseWake();
+    maybeRelease();
     breathRunning = false;
     if(breathTimer){ clearTimeout(breathTimer); breathTimer = null; }
     patternSelect.disabled = false; cyclesSelect.disabled = false;
@@ -992,6 +1064,12 @@
     if(tabPanels.pomodoro.classList.contains('active')){
       if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); pRunning ? pPause() : pPlay(); }
       else if(e.key === 'r' || e.key === 'R'){ pReset(); }
+      return;
+    }
+    if(tabPanels.stopwatch.classList.contains('active')){
+      if(e.key === ' ' || e.code === 'Space'){ e.preventDefault(); swRunning ? swPause() : swPlay(); }
+      else if(e.key === 'l' || e.key === 'L'){ swRecordLap(); }
+      else if(e.key === 'r' || e.key === 'R'){ swReset(); }
       return;
     }
     if(tabPanels.countup.classList.contains('active')){

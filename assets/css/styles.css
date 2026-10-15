@@ -509,3 +509,17 @@
   .options-row .len-field{ flex:none; }
   .options-row .settings-btn{ flex:none; width:100%; box-sizing:border-box; padding-left:10px; padding-right:10px; }
   .options-row select{ box-sizing:border-box; }
+
+  /* ---- Stopwatch ---- */
+  .sw-time{ font-size:2.5rem; }
+  .sw-lap-btn{ font-size:.82rem; }
+  .sw-lap-btn:disabled{ opacity:.45; cursor:default; }
+  .lap-list{ list-style:none; margin:18px 0 0; padding:0; width:100%; max-width:340px; max-height:240px; overflow-y:auto;
+    border-top:1px solid var(--border); }
+  .lap-list[hidden]{ display:none; }
+  .lap-list li{ display:grid; grid-template-columns:1fr auto auto; gap:14px; padding:9px 4px; border-bottom:1px solid var(--border);
+    font-size:.88rem; font-variant-numeric:tabular-nums; }
+  .lap-n{ color:var(--text-dim); }
+  .lap-t{ color:var(--text); }
+  .lap-total{ color:var(--text-dim); min-width:78px; text-align:right; }
+  @media (max-width:600px){ .sw-time{ font-size:2.1rem; } }
