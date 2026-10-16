@@ -523,3 +523,13 @@
   .lap-t{ color:var(--text); }
   .lap-total{ color:var(--text-dim); min-width:78px; text-align:right; }
   @media (max-width:600px){ .sw-time{ font-size:2.1rem; } }
+
+  /* Pomodoro: a faint original tomato behind the ring, tinted with the theme's accent color */
+  #panel-pomodoro{ overflow-x:clip; }
+  .tomato-bg{ position:absolute; left:50%; top:50%; width:132%; height:132%; transform:translate(-50%,-44%); pointer-events:none; z-index:0; }
+  .tomato-bg .tm-body{ fill:var(--accent); opacity:.13; }
+  .tomato-bg .tm-shine{ fill:var(--bg); opacity:.22; }
+  .tomato-bg .tm-leaf, .tomato-bg .tm-stem{ fill:var(--accent); opacity:.22; }
+  #panel-pomodoro .ring-wrap svg:not(.tomato-bg){ position:relative; z-index:1; }
+  #panel-pomodoro .ring-center{ z-index:2; }
+  @media (max-width:600px){ .tomato-bg{ width:118%; height:118%; } }
