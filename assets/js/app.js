@@ -34,7 +34,7 @@
   let customTimes = []; // minutes
   let storeReady = false; // true once saved settings have been loaded
 
-  const settings = { startEnabled:true, endEnabled:true, intervalEnabled:false, mode:'regular', prepSeconds:5, bellSound:'bowl', startCount:1, endCount:1, segEnabled:true, segCount:1, volume:1 };
+  const settings = { startEnabled:true, endEnabled:true, intervalEnabled:false, mode:'regular', prepSeconds:5, bellSound:'bowl', startCount:1, endCount:1, segEnabled:true, segCount:1, volume:1, vibrate:false };
   document.getElementById('prepSelect').addEventListener('change', e=>{ settings.prepSeconds = Number(e.target.value); });
 
   // ---------- DOM ----------
@@ -179,7 +179,15 @@
     if(kind === 'interval') playSound('interval', 1, INTERVAL_GAIN);
     else playSound(settings.bellSound, count || 1, 0.9);
   }
+  // Vibration (phones and tablets whose browser supports it; most iPhones do not). Off unless switched on in Bell Settings.
+  const VIBRATE_OK = typeof navigator.vibrate === 'function';
+  const VIBRATE_PATTERNS = { start:[200], end:[300,150,300,150,300] };
+  function vibrate(kind){
+    if(!settings.vibrate || !VIBRATE_OK) return;
+    try{ navigator.vibrate(VIBRATE_PATTERNS[kind]); }catch(e){}
+  }
   function playBell(kind){
+    if(kind==='start' || kind==='end') vibrate(kind);   // independent of whether the bell sound itself is on
     if(kind==='start' && !settings.startEnabled) return;
     if(kind==='end' && !settings.endEnabled) return;
     if(kind==='interval' && !settings.intervalEnabled) return;
@@ -477,6 +485,17 @@
   document.getElementById('endEnabled').addEventListener('change', e=>{
     settings.endEnabled = e.target.checked;
     document.getElementById('endBody').classList.toggle('sub-disabled', !e.target.checked);
+  });
+
+  const vibrateBox = document.getElementById('vibrateEnabled');
+  if(!VIBRATE_OK){
+    vibrateBox.disabled = true;
+    document.getElementById('vibrateNote').textContent = 'Not supported by this browser or device.';
+  }
+  vibrateBox.addEventListener('change', e=>{
+    settings.vibrate = e.target.checked && VIBRATE_OK;
+    // A short buzz confirms it works, but only when the person flips the switch (not when saved settings load).
+    if(settings.vibrate && e.isTrusted){ try{ navigator.vibrate(120); }catch(err){} }
   });
 
   document.getElementById('segEnabled').addEventListener('change', e=>{
@@ -1093,7 +1112,7 @@
         scheme: schemeSelect.value, duration: durationSelect.value, customLen: customLenInput.value,
         bell: bellSelect.value, volume: volumeRange.value,
         startEnabled: $('startEnabled').checked, startCount: $('startCount').value,
-        endEnabled: $('endEnabled').checked, endCount: $('endCount').value,
+        endEnabled: $('endEnabled').checked, endCount: $('endCount').value, vibrate: $('vibrateEnabled').checked,
         prep: $('prepSelect').value,
         intervalEnabled: $('intervalEnabled').checked, mode: settings.mode,
         intervalEvery: intervalEvery.value, customTimes: customTimes,
@@ -1126,7 +1145,7 @@
       setVal('bellSelect', d.bell);
       setVal('volumeRange', d.volume);
       setVal('startEnabled', d.startEnabled); setVal('startCount', d.startCount);
-      setVal('endEnabled', d.endEnabled); setVal('endCount', d.endCount);
+      setVal('endEnabled', d.endEnabled); setVal('endCount', d.endCount); setVal('vibrateEnabled', d.vibrate);
       setVal('prepSelect', d.prep);
       if(Array.isArray(d.customTimes)){
         customTimes = d.customTimes.map(Number).filter(n=> n>=1 && n<=59);

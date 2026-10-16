@@ -8,8 +8,9 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Timer:** 5 to 60 minute sessions, a custom length, or a **sit and walk sequence** made of up to 12 segments
   (each Sit or Walk, 1 to 120 minutes) with presets, saved layouts and a bell between segments.
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
-  bell (repeating or custom times), volume, and a preparation delay.
-- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts. **More ▾:** a menu of extra timers, Pomodoro, Count Up and Stopwatch.
+  bell (repeating or custom times), volume, a preparation delay, and an optional vibration at the start and end
+  (off by default; needs a browser that supports the Vibration API, which most iPhones lack).
+- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts. **More ▾:** a menu of extra timers: Pomodoro, Count Up and Stopwatch.
 - **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
   wake lock during sessions.
 - Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates strip under the
