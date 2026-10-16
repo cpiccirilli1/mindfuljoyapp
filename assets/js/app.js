@@ -490,7 +490,7 @@
   const vibrateBox = document.getElementById('vibrateEnabled');
   if(!VIBRATE_OK){
     vibrateBox.disabled = true;
-    document.getElementById('vibrateNote').textContent = 'Not supported by this browser or device.';
+    document.getElementById('vibrateNote').textContent = 'Unavailable here: this browser or device does not support vibration. It works on most Android phones.';
   }
   vibrateBox.addEventListener('change', e=>{
     settings.vibrate = e.target.checked && VIBRATE_OK;

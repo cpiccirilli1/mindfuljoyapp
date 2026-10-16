@@ -533,3 +533,12 @@
   #panel-pomodoro .ring-wrap svg:not(.tomato-bg){ position:relative; z-index:1; }
   #panel-pomodoro .ring-center{ z-index:2; }
   @media (max-width:600px){ .tomato-bg{ width:118%; height:118%; } }
+
+  /* Unavailable switches: dashed, empty track and a dimmed label so they never look like a normal "off" switch */
+  .switch input:disabled{ cursor:not-allowed; }
+  .switch input:disabled + .slider{
+    background:transparent; border:2px dashed var(--text-dim); box-sizing:border-box; opacity:.7;
+  }
+  .switch input:disabled + .slider::before{ background:var(--text-dim); opacity:.6; left:2px; top:2px; }
+  .row-label:has(input:disabled) > span:first-child{ opacity:.5; }
+  .row-label:has(input:disabled) + .row-note{ opacity:.9; font-style:italic; }
