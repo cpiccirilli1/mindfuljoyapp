@@ -45,6 +45,8 @@ assets/
   favicon.svg         Site icon (the lotus flower)
   icons/              App icons (icon.svg is the source; PNG sizes are rendered from icon-full.svg)
   js/pwa.js           Registers the service worker
+  js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
+                      (checks the address, not the branch, so merging to main never marks production; edit LIVE_HOSTS if the live address changes)
 ```
 
 ## Deploying
