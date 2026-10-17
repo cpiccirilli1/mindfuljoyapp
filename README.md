@@ -10,11 +10,16 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
   bell (repeating or custom times), volume, a preparation delay, and an optional vibration at the start and end
   (off by default; needs a browser that supports the Vibration API, which most iPhones lack).
-- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts. **More ▾:** a menu of extra timers: Pomodoro, Count Up and Stopwatch.
+- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts.
+- **More ▾:** a menu of extra timers. **Pomodoro** (focus, short and long breaks, rounds, auto-start, a faint
+  theme-tinted tomato behind the ring), **Count Up** (open-ended, optional interval chime) and **Stopwatch**
+  (hundredths of a second and up to 99 laps). Only one timer runs at a time.
 - **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
   wake lock during sessions.
-- Header menu (Timer, Articles, About, Privacy Policy, Terms of Service), a dismissible updates strip under the
-  header, and a cookie notice.
+- Header menu (Timer, Articles, About, Privacy Policy, Terms of Service; on phones it also holds Donations), a
+  dismissible updates strip under the header, and a cookie notice.
+- **Works offline and installs** to the home screen or desktop (web app manifest and a service worker).
+- About page with credits, the open source notice and a land acknowledgement linking to native-land.ca.
 
 ## Files
 
@@ -40,13 +45,14 @@ assets/
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
+  js/pwa.js           Registers the service worker (every page)
+  js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
+                      (checks the address, not the branch, so merging to main never marks production;
+                      edit LIVE_HOSTS if the live address changes)
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon (the lotus flower)
   icons/              App icons (icon.svg is the source; PNG sizes are rendered from icon-full.svg)
-  js/pwa.js           Registers the service worker
-  js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
-                      (checks the address, not the branch, so merging to main never marks production; edit LIVE_HOSTS if the live address changes)
 ```
 
 ## Deploying
@@ -57,7 +63,8 @@ and serves the repository root as static assets, on https://mindfuljoy.app.
 - **`main` branch:** every push to `main` goes live on mindfuljoy.app.
 - **Other branches (for example `dev`):** every push builds a preview at its own address, found in the
   Cloudflare dashboard under the project's Deployments. The live site is not touched.
-- **Suggested workflow:** make changes on `dev`, check the preview, then merge `dev` into `main` to publish.
+- **Suggested workflow:** make changes on `dev`, check the preview (it shows a "Preview build" tag), then merge
+  `dev` into `main` to publish.
 
 `wrangler.jsonc` holds the Worker name, a compatibility date, the assets folder (`./`) and an empty `previews`
 block, which the non-production deploy command (`npx wrangler preview`) requires. `.assetsignore` keeps
@@ -113,12 +120,15 @@ Third-party assets keep their own licenses:
 
 - **Bell recordings** (`assets/audio/*.mp3`): Creative Commons CC0 1.0 (public domain). Credits and sources are in `assets/audio/CREDITS.txt`.
 - **Inter typeface**: SIL Open Font License 1.1, loaded from Google Fonts.
+- **Icons and logo** (lotus flower, tomato): original artwork made for this project, covered by the MIT License.
 
 ## Notes
 
 - Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
   current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
-  Nothing is sent to a server by the site itself.
+  Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
+  files in the browser (cache `mj-v3`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
   request, self-host the font and delete the Google Fonts `<link>` tags.
 - The Ko-fi link and contact email are set in the Donations button (every page header) and in about.html,
