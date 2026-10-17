@@ -63,4 +63,5 @@ LAYOUT FIXES
 LEARNING JAVASCRIPT
 -------------------
 [ ] Move timer logic into small functions and add a few tests
-[ ] Split app.js (about 1010 lines now, Pomodoro included) into separate files by feature
+[x] Split app.js into separate files by feature (assets/js/app/, 17 files)
+[ ] Next step for the split: switch to ES modules (import / export) so files stop sharing one scope

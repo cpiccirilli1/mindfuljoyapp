@@ -41,7 +41,10 @@ TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
-  js/app.js           Timer, sit/walk sequences, bells, breathing pacer, Pomodoro, Count Up, Stopwatch, settings (index.html only)
+  js/app/             The timer page (index.html only), one file per feature, loaded in this order:
+                        core, wake, audio, sequence, timer, bell-settings, intervals, tabs,
+                        pomodoro, countup, stopwatch, breathing, reflect, theme-menu,
+                        sequence-editor, shortcuts, storage
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
@@ -127,7 +130,7 @@ Third-party assets keep their own licenses:
 - Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
   current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v3`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v4`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
   request, self-host the font and delete the Google Fonts `<link>` tags.
