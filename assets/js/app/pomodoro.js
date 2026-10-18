@@ -1,16 +1,18 @@
-// Pomodoro timer (More menu).
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Pomodoro timer (More menu): focus rounds with short breaks and a long break at the end.
+import { $ } from './dom.js';
+import { fmt, announce, initRing, setRing } from './display.js';
+import { ensureAudio, stopBells, playBell } from './audio.js';
+import { acquireWake, releaseWake } from './wake.js';
+import { registerActivity, pauseOthers, maybeRelease, updateLive } from './activity.js';
 
-// ---------- Pomodoro ----------
-const pEl = { time: document.getElementById('pomoTime'), phase: document.getElementById('pomoPhase'), round: document.getElementById('pomoRound'),
-  ring: document.getElementById('pomoRing'), play: document.getElementById('pomoPlay'), reset: document.getElementById('pomoReset'), skip: document.getElementById('pomoSkip'),
-  focus: document.getElementById('pomoFocus'), short: document.getElementById('pomoShort'), long: document.getElementById('pomoLong'),
-  rounds: document.getElementById('pomoRounds'), auto: document.getElementById('pomoAuto') };
-pEl.ring.style.strokeDasharray = CIRC;
-
+const pEl = { time: $('pomoTime'), phase: $('pomoPhase'), round: $('pomoRound'),
+  ring: $('pomoRing'), play: $('pomoPlay'), reset: $('pomoReset'), skip: $('pomoSkip'),
+  focus: $('pomoFocus'), short: $('pomoShort'), long: $('pomoLong'),
+  rounds: $('pomoRounds'), auto: $('pomoAuto') };
+initRing(pEl.ring);
 let pPlan = [], pIdx = 0, pRunning = false, pStart = 0, pPaused = 0, pHandle = null, pStarted = false;
 
+// The cycle as a list of steps: focus, break, focus, break, ... with the last break long.
 function buildPlan(){
   const f = +pEl.focus.value * 60, sb = +pEl.short.value * 60, lb = +pEl.long.value * 60, n = +pEl.rounds.value;
   const plan = [];
@@ -24,12 +26,11 @@ const P_NAME = { focus:'Focus', short:'Short break', long:'Long break' };
 function pRender(remaining){
   const cur = pPlan[pIdx];
   pEl.time.textContent = fmt(remaining);
-  const frac = cur.secs ? Math.max(0, Math.min(1, remaining / cur.secs)) : 0;
-  pEl.ring.style.strokeDashoffset = CIRC * (1 - frac);
+  setRing(pEl.ring, cur.secs ? Math.max(0, Math.min(1, remaining / cur.secs)) : 0);
   pEl.phase.textContent = !pRunning && pStarted && pPaused > 0 ? 'Paused' : P_NAME[cur.kind];
   pEl.round.textContent = 'Round ' + cur.round + ' of ' + pPlan.filter(x=>x.kind==='focus').length;
 }
-
+// Lengths can't be changed once a cycle has started.
 function pLock(){
   const lock = pStarted;
   [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=>{ e.disabled = lock; });
@@ -73,9 +74,7 @@ function pAdvance(fromTimer){
   pSetButtons();
 }
 function pPlay(){
-  if(isRunning) pause();
-  cuPause(); swPause();
-  stopBreathing();
+  pauseOthers('pomodoro');
   ensureAudio(); acquireWake();
   if(!pStarted){ pStarted = true; playBell('start'); pPaused = 0; }
   pRunning = true; pStart = Date.now() - pPaused * 1000;
@@ -90,8 +89,12 @@ function pPause(){
   maybeRelease();
   announce('Paused'); pRender(pPlan[pIdx].secs - pPaused); pSetButtons();
 }
-function pReset(){ stopBells(); maybeRelease(); pIdle(); announce('Pomodoro reset'); }
-pEl.play.addEventListener('click', ()=>{ pRunning ? pPause() : pPlay(); });
+export function pReset(){ stopBells(); maybeRelease(); pIdle(); announce('Pomodoro reset'); }
+export function pToggle(){ pRunning ? pPause() : pPlay(); }
+
+registerActivity('pomodoro', { isRunning: ()=> pRunning, pause: pPause, more: true });
+
+pEl.play.addEventListener('click', pToggle);
 pEl.reset.addEventListener('click', pReset);
 pEl.skip.addEventListener('click', ()=>{ if(pStarted) pAdvance(false); });
 [pEl.focus, pEl.short, pEl.long, pEl.rounds].forEach(e=> e.addEventListener('change', ()=>{ if(!pStarted) pIdle(); }));

@@ -1,15 +1,19 @@
-// Count Up timer (More menu).
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Count Up timer (More menu): runs until you stop it, with an optional interval chime.
+import { $ } from './dom.js';
+import { fmt, announce, initRing, setRing } from './display.js';
+import { ensureAudio, stopBells, playBell } from './audio.js';
+import { acquireWake } from './wake.js';
+import { registerActivity, pauseOthers, maybeRelease, updateLive } from './activity.js';
 
-// ---------- Count Up (open-ended stopwatch) ----------
-const cuEl = { time: document.getElementById('cuTime'), phase: document.getElementById('cuPhase'), ring: document.getElementById('cuRing'),
-  play: document.getElementById('cuPlay'), reset: document.getElementById('cuReset'), chime: document.getElementById('cuChime') };
-cuEl.ring.style.strokeDasharray = CIRC;
+const cuEl = { time: $('cuTime'), phase: $('cuPhase'), ring: $('cuRing'),
+  play: $('cuPlay'), reset: $('cuReset'), chime: $('cuChime') };
+initRing(cuEl.ring);
+let cuRunning = false, cuStart = 0, cuElapsed = 0, cuHandle = null, cuLastChime = 0;
+
 function cuRender(){
   const s = Math.floor(cuElapsed);
   cuEl.time.textContent = fmt(s);
-  cuEl.ring.style.strokeDashoffset = CIRC * (1 - (cuElapsed % 60) / 60);
+  setRing(cuEl.ring, (cuElapsed % 60) / 60);   // the ring fills once a minute
   cuEl.phase.textContent = cuRunning ? 'Sitting' : (cuElapsed > 0 ? 'Paused' : 'Ready');
 }
 function cuButtons(){
@@ -27,8 +31,7 @@ function cuTick(){
   cuRender();
 }
 function cuPlay(){
-  if(isRunning) pause();
-  pPause(); swPause(); stopBreathing();
+  pauseOthers('countup');
   ensureAudio(); acquireWake();
   if(cuElapsed === 0){ playBell('start'); cuLastChime = 0; }
   cuRunning = true; cuStart = Date.now() - cuElapsed * 1000;
@@ -43,11 +46,15 @@ function cuPause(){
   maybeRelease();
   announce('Paused ' + fmt(cuElapsed)); cuRender(); cuButtons();
 }
-function cuReset(){
+export function cuReset(){
   cuRunning = false; clearInterval(cuHandle); cuHandle = null; cuElapsed = 0; cuLastChime = 0;
   stopBells(); maybeRelease();
   announce('Count up reset'); cuRender(); cuButtons();
 }
-cuEl.play.addEventListener('click', ()=>{ cuRunning ? cuPause() : cuPlay(); });
+export function cuToggle(){ cuRunning ? cuPause() : cuPlay(); }
+
+registerActivity('countup', { isRunning: ()=> cuRunning, pause: cuPause, more: true });
+
+cuEl.play.addEventListener('click', cuToggle);
 cuEl.reset.addEventListener('click', cuReset);
 cuRender(); cuButtons();

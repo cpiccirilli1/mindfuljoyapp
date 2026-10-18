@@ -1,10 +1,7 @@
-// Keeps the screen awake while a timer runs (Screen Wake Lock).
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
-
-// ---------- Keep screen awake during sessions ----------
+// Keeps the screen awake while a timer runs (Screen Wake Lock, where the browser has it).
 let wakeLock = null, wakeWanted = false;
-async function acquireWake(){
+
+export async function acquireWake(){
   wakeWanted = true;
   try{
     if('wakeLock' in navigator && !wakeLock){
@@ -13,14 +10,14 @@ async function acquireWake(){
     }
   }catch(e){ wakeLock = null; }
 }
-function releaseWake(){
+
+export function releaseWake(){
   wakeWanted = false;
   try{ if(wakeLock){ wakeLock.release(); } }catch(e){}
   wakeLock = null;
 }
+
+// The browser drops the lock when the tab is hidden; ask for it again when the tab comes back.
 document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'visible'){
-    if(wakeWanted) acquireWake();
-    if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
-  }
+  if(document.visibilityState === 'visible' && wakeWanted) acquireWake();
 });

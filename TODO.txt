@@ -63,5 +63,5 @@ LAYOUT FIXES
 LEARNING JAVASCRIPT
 -------------------
 [ ] Move timer logic into small functions and add a few tests
-[x] Split app.js into separate files by feature (assets/js/app/, 17 files)
-[ ] Next step for the split: switch to ES modules (import / export) so files stop sharing one scope
+[x] Split app.js into separate files by feature (assets/js/app/)
+[x] Switch the split files to ES modules (import / export) so files stop sharing one scope

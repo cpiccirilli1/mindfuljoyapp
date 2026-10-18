@@ -1,9 +1,29 @@
 // Interval bells: when they ring (regular or custom times) and the controls for them.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+import { $ } from './dom.js';
+import { settings } from './state.js';
+import { playBell } from './audio.js';
+import { announce } from './display.js';
 
-// ---------- Interval schedule ----------
-function triggerPoints(){
+// "Ring every N minutes" menu
+const intervalEvery = $('intervalEvery');
+for(let m=1; m<=30; m++){
+  const opt = document.createElement('option');
+  opt.value = m; opt.textContent = m + (m===1?' minute':' minutes');
+  if(m===5) opt.selected = true;
+  intervalEvery.appendChild(opt);
+}
+
+let customTimes = [];          // minutes, for "custom times" mode
+const triggered = new Set();   // interval bells already rung in this session
+
+// Forget which bells have rung (a new session started, or the schedule changed).
+export function resetIntervals(){ triggered.clear(); }
+
+export function getCustomTimes(){ return customTimes; }
+export function setCustomTimes(list){ customTimes = list; renderChips(); }
+
+// Seconds into the session at which an interval bell should ring.
+function triggerPoints(totalSeconds){
   const pts = [];
   if(!settings.intervalEnabled) return pts;
   if(settings.mode === 'regular'){
@@ -18,30 +38,44 @@ function triggerPoints(){
   return pts.sort((a,b)=>a-b);
 }
 
-const intervalBody = document.getElementById('intervalBody');
-document.getElementById('intervalEnabled').addEventListener('change', e=>{
+// Called on every tick of a running session: ring any bell whose time has come.
+export function checkIntervals(elapsed, totalSeconds){
+  triggerPoints(totalSeconds).forEach(pt=>{
+    if(!triggered.has(pt) && elapsed >= pt){
+      triggered.add(pt);
+      playBell('interval');
+      announce('Interval bell');
+    }
+  });
+}
+
+// ----- Controls in Bell Settings -----
+intervalEvery.addEventListener('change', resetIntervals);
+
+const intervalBody = $('intervalBody');
+$('intervalEnabled').addEventListener('change', e=>{
   settings.intervalEnabled = e.target.checked;
   intervalBody.classList.toggle('sub-disabled', !e.target.checked);
-  triggered.clear();
+  resetIntervals();
 });
 
-const modeRegularBtn = document.getElementById('modeRegularBtn');
-const modeCustomBtn = document.getElementById('modeCustomBtn');
-const regularFields = document.getElementById('regularFields');
-const customFields = document.getElementById('customFields');
-function setMode(mode){
+const modeRegularBtn = $('modeRegularBtn');
+const modeCustomBtn = $('modeCustomBtn');
+const regularFields = $('regularFields');
+const customFields = $('customFields');
+export function setMode(mode){
   settings.mode = mode;
   modeRegularBtn.classList.toggle('active', mode==='regular');
   modeCustomBtn.classList.toggle('active', mode==='custom');
   regularFields.style.display = mode==='regular' ? '' : 'none';
   customFields.style.display = mode==='custom' ? '' : 'none';
-  triggered.clear();
+  resetIntervals();
 }
 modeRegularBtn.addEventListener('click', ()=>setMode('regular'));
 modeCustomBtn.addEventListener('click', ()=>setMode('custom'));
 
-const customChips = document.getElementById('customChips');
-const customMinuteInput = document.getElementById('customMinuteInput');
+const customChips = $('customChips');
+const customMinuteInput = $('customMinuteInput');
 function renderChips(){
   customChips.innerHTML = '';
   if(customTimes.length===0){
@@ -56,23 +90,23 @@ function renderChips(){
     chip.className = 'chip';
     chip.innerHTML = '<span>' + m + ' min</span>';
     const rm = document.createElement('button');
-    rm.textContent = '\u00d7';
+    rm.textContent = '×';
     rm.setAttribute('aria-label','Remove ' + m + ' minute bell');
     rm.addEventListener('click', ()=>{
       customTimes = customTimes.filter(x=>x!==m);
       renderChips();
-      triggered.clear();
+      resetIntervals();
     });
     chip.appendChild(rm);
     customChips.appendChild(chip);
   });
 }
-document.getElementById('addCustomBtn').addEventListener('click', ()=>{
+$('addCustomBtn').addEventListener('click', ()=>{
   const v = Math.round(Number(customMinuteInput.value));
   if(!v || v<1 || v>59) return;
   if(!customTimes.includes(v)) customTimes.push(v);
   customMinuteInput.value = '';
   renderChips();
-  triggered.clear();
+  resetIntervals();
 });
 renderChips();

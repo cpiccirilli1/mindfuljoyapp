@@ -1,8 +1,6 @@
-// Reflect tab: random prompts.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Reflect tab: shows a random prompt (never the same one twice in a row).
+import { $ } from './dom.js';
 
-// ---------- Reflection prompts ----------
 const PROMPTS = [
   'What feeling is most present in your body right now?',
   'What are you carrying today that you could set down?',
@@ -18,8 +16,8 @@ const PROMPTS = [
   'What intention would you like to carry into the rest of your day?'
 ];
 let lastPrompt = -1;
-const reflectText = document.getElementById('reflectText');
-document.getElementById('reflectBtn').addEventListener('click', ()=>{
+const reflectText = $('reflectText');
+$('reflectBtn').addEventListener('click', ()=>{
   let idx;
   do { idx = Math.floor(Math.random()*PROMPTS.length); } while(idx===lastPrompt && PROMPTS.length>1);
   lastPrompt = idx;

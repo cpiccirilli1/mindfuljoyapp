@@ -1,13 +1,16 @@
-// Stopwatch with laps (More menu).
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Stopwatch (More menu): hundredths of a second, with laps.
+import { $ } from './dom.js';
+import { announce, initRing, setRing } from './display.js';
+import { acquireWake } from './wake.js';
+import { registerActivity, pauseOthers, maybeRelease, updateLive } from './activity.js';
 
-// ---------- Stopwatch (hundredths of a second, with laps) ----------
-const swEl = { time: document.getElementById('swTime'), phase: document.getElementById('swPhase'), ring: document.getElementById('swRing'),
-  play: document.getElementById('swPlay'), reset: document.getElementById('swReset'), lap: document.getElementById('swLap'), laps: document.getElementById('swLaps') };
-swEl.ring.style.strokeDasharray = CIRC;
+const swEl = { time: $('swTime'), phase: $('swPhase'), ring: $('swRing'),
+  play: $('swPlay'), reset: $('swReset'), lap: $('swLap'), laps: $('swLaps') };
+initRing(swEl.ring);
 const SW_MAX_LAPS = 99;
+let swRunning = false, swElapsed = 0;
 let swStart = 0, swHandle = null, swLaps = [], swLastLap = 0; // swHandle is a requestAnimationFrame id
+
 function fmtSw(ms){
   ms = Math.max(0, Math.floor(ms));
   const cs = Math.floor((ms % 1000) / 10), s = Math.floor(ms / 1000) % 60, m = Math.floor(ms / 60000) % 60, h = Math.floor(ms / 3600000);
@@ -16,7 +19,7 @@ function fmtSw(ms){
 }
 function swRender(){
   swEl.time.textContent = fmtSw(swElapsed);
-  swEl.ring.style.strokeDashoffset = CIRC * (1 - (swElapsed % 60000) / 60000);
+  setRing(swEl.ring, (swElapsed % 60000) / 60000);   // the ring fills once a minute
   swEl.phase.textContent = swRunning ? 'Running' : (swElapsed > 0 ? 'Paused' : 'Ready');
 }
 function swButtons(){
@@ -30,8 +33,7 @@ function swTick(){ swElapsed = Date.now() - swStart; swRender(); }
 function swLoop(){ swTick(); swHandle = requestAnimationFrame(swLoop); }
 function swStopLoop(){ if(swHandle !== null){ cancelAnimationFrame(swHandle); swHandle = null; } }
 function swPlay(){
-  if(isRunning) pause();
-  pPause(); cuPause(); stopBreathing();
+  pauseOthers('stopwatch');
   acquireWake();
   swRunning = true; swStart = Date.now() - swElapsed;
   swStopLoop(); swLoop();
@@ -45,7 +47,7 @@ function swPause(){
   maybeRelease();
   announce('Paused ' + fmtSw(swElapsed).replace('.', ' point ')); swRender(); swButtons();
 }
-function swRecordLap(){
+export function swRecordLap(){
   if(!swRunning || swLaps.length >= SW_MAX_LAPS) return;
   swElapsed = Date.now() - swStart;
   const lapMs = swElapsed - swLastLap; swLastLap = swElapsed;
@@ -59,13 +61,17 @@ function swRecordLap(){
   announce('Lap ' + swLaps.length + ', ' + fmtSw(lapMs).replace('.', ' point '));
   swButtons();
 }
-function swReset(){
+export function swReset(){
   swRunning = false; swStopLoop(); swElapsed = 0; swLastLap = 0; swLaps = [];
   swEl.laps.textContent = ''; swEl.laps.hidden = true;
   maybeRelease();
   announce('Stopwatch reset'); swRender(); swButtons();
 }
-swEl.play.addEventListener('click', ()=>{ swRunning ? swPause() : swPlay(); });
+export function swToggle(){ swRunning ? swPause() : swPlay(); }
+
+registerActivity('stopwatch', { isRunning: ()=> swRunning, pause: swPause, more: true });
+
+swEl.play.addEventListener('click', swToggle);
 swEl.reset.addEventListener('click', swReset);
 swEl.lap.addEventListener('click', swRecordLap);
 swRender(); swButtons();

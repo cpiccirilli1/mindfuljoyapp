@@ -1,12 +1,12 @@
-// Color scheme picker and the gear menu (themes themselves live in themes.js).
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Color scheme picker and the gear menu that holds it.
+// The themes themselves are defined in themes.js (a regular script that sets window.MJ).
+import { $ } from './dom.js';
+import { store } from './state.js';
 
-// ---------- Color schemes ----------
 const SCHEMES = window.MJ.SCHEMES;
 const applyScheme = window.MJ.applyScheme;
 
-const schemeSelect = document.getElementById('schemeSelect');
+const schemeSelect = $('schemeSelect');
 window.MJ.fillSelect(schemeSelect, 'sage');
 schemeSelect.addEventListener('change', ()=>{
   const s = SCHEMES.find(x=>x.id===schemeSelect.value);
@@ -14,16 +14,17 @@ schemeSelect.addEventListener('change', ()=>{
 });
 applyScheme(SCHEMES.find(x=>x.id==='sage'));
 
-// ---------- Theme gear menu ----------
-const themeBtn = document.getElementById('themeBtn');
-const themePop = document.getElementById('themePop');
-const themeMenu = document.getElementById('themeMenu');
+// ----- Gear menu -----
+const themeBtn = $('themeBtn');
+const themePop = $('themePop');
+const themeMenu = $('themeMenu');
+export const isThemeMenuOpen = () => !themePop.hidden;
 function openThemeMenu(){ themePop.hidden = false; themeBtn.setAttribute('aria-expanded','true'); }
-function closeThemeMenu(returnFocus){
+export function closeThemeMenu(returnFocus){
   const wasOpen = !themePop.hidden;
   themePop.hidden = true; themeBtn.setAttribute('aria-expanded','false');
   if(wasOpen && returnFocus) themeBtn.focus();
 }
 themeBtn.addEventListener('click', ()=>{ themePop.hidden ? openThemeMenu() : closeThemeMenu(false); });
 document.addEventListener('click', e=>{ if(!themePop.hidden && !themeMenu.contains(e.target)) closeThemeMenu(false); });
-schemeSelect.addEventListener('change', ()=>{ if(storeReady) closeThemeMenu(true); });
+schemeSelect.addEventListener('change', ()=>{ if(store.ready) closeThemeMenu(true); });

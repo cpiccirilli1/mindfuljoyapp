@@ -1,18 +1,24 @@
-// Sit + walk editor: rows, presets, saved layouts.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Sit + walk editor: the rows, presets, and layouts saved on this device.
+import { $ } from './dom.js';
+import { announce } from './display.js';
+import { seq, isSeq, cleanSegments, seqTotalSeconds, seqSummary, MAX_SEGMENTS, MAX_SEG_MIN } from './sequence.js';
+import { setDuration, isIdle } from './timer.js';
 
-// ---------- Sequence editor ----------
-const segList = document.getElementById('segList');
-const seqTotal = document.getElementById('seqTotal');
-const seqMsg = document.getElementById('seqMsg');
+const segList = $('segList');
+const seqTotal = $('seqTotal');
+const seqMsg = $('seqMsg');
 const LAYOUT_KEY = 'still.layouts.v1';
+
+// Show a message under the editor and read it out to screen readers.
 function say(msg){ seqMsg.textContent = msg; announce(msg); }
+
+// The list changed shape: redraw it, and update the timer if it is idle.
 function segmentsChanged(){
   renderSegments();
-  if(phase === 'idle' && isSeq()) setDuration();
+  if(isIdle() && isSeq()) setDuration();
 }
-function renderSegments(){
+export function renderSegments(){
+  const segments = seq.segments;
   segList.innerHTML = '';
   segments.forEach((sg, i)=>{
     const li = document.createElement('li');
@@ -47,18 +53,18 @@ function renderSegments(){
     segList.appendChild(li);
   });
   seqTotal.textContent = Math.round(seqTotalSeconds()/60) + ' min total';
-  document.getElementById('addSitBtn').disabled = document.getElementById('addWalkBtn').disabled = segments.length >= MAX_SEGMENTS;
+  $('addSitBtn').disabled = $('addWalkBtn').disabled = segments.length >= MAX_SEGMENTS;
 }
 // Typing or choosing a value updates the data in place. The list is only
 // redrawn for structural changes (move, add, remove, preset, load), so the
 // field you are in never gets replaced while you use it.
 function segValuesChanged(){
   seqTotal.textContent = Math.round(seqTotalSeconds()/60) + ' min total';
-  if(phase === 'idle' && isSeq()) setDuration();
+  if(isIdle() && isSeq()) setDuration();
 }
 segList.addEventListener('change', e=>{
   const li = e.target.closest('.seg-row'); if(!li) return;
-  const sg = segments[Number(li.dataset.i)];
+  const sg = seq.segments[Number(li.dataset.i)];
   if(e.target.classList.contains('seg-type')) sg.type = e.target.value === 'walk' ? 'walk' : 'sit';
   if(e.target.classList.contains('seg-min')){
     sg.minutes = Math.min(MAX_SEG_MIN, Math.max(1, Math.round(Number(e.target.value)) || 1));
@@ -70,11 +76,12 @@ segList.addEventListener('input', e=>{
   if(!e.target.classList.contains('seg-min')) return;
   const v = Math.round(Number(e.target.value));
   if(v >= 1 && v <= MAX_SEG_MIN){
-    segments[Number(e.target.closest('.seg-row').dataset.i)].minutes = v;
+    seq.segments[Number(e.target.closest('.seg-row').dataset.i)].minutes = v;
     segValuesChanged();
   }
 });
 segList.addEventListener('click', e=>{
+  const segments = seq.segments;
   const b = e.target.closest('.seg-btn'); if(!b) return;
   const i = Number(b.closest('.seg-row').dataset.i);
   if(b.classList.contains('seg-remove') && segments.length > 1) segments.splice(i, 1);
@@ -88,12 +95,12 @@ segList.addEventListener('click', e=>{
   if(again && !again.disabled) again.focus(); else if(row) row.querySelector('.seg-type').focus();
 });
 function addSeg(type){
-  if(segments.length >= MAX_SEGMENTS) return;
-  segments.push({type, minutes: type === 'walk' ? 10 : 20});
+  if(seq.segments.length >= MAX_SEGMENTS) return;
+  seq.segments.push({type, minutes: type === 'walk' ? 10 : 20});
   segmentsChanged();
 }
-document.getElementById('addSitBtn').addEventListener('click', ()=>addSeg('sit'));
-document.getElementById('addWalkBtn').addEventListener('click', ()=>addSeg('walk'));
+$('addSitBtn').addEventListener('click', ()=>addSeg('sit'));
+$('addWalkBtn').addEventListener('click', ()=>addSeg('walk'));
 
 const PRESETS = {
   'sit-walk-sit': [['sit',20],['walk',10],['sit',20]],
@@ -101,20 +108,20 @@ const PRESETS = {
   'walk-sit': [['walk',10],['sit',20]],
   'rounds': [['sit',10],['walk',5],['sit',10],['walk',5]]
 };
-const presetSelect = document.getElementById('presetSelect');
+const presetSelect = $('presetSelect');
 presetSelect.addEventListener('change', ()=>{
   const p = PRESETS[presetSelect.value];
   if(!p) return;
-  segments = p.map(([type,minutes])=>({type, minutes}));
+  seq.segments = p.map(([type,minutes])=>({type, minutes}));
   presetSelect.value = '';
   segmentsChanged();
   say('Preset applied: ' + seqSummary());
 });
 
-// Saved sequences (on this device only)
-const layoutName = document.getElementById('layoutName');
-const layoutSelect = document.getElementById('layoutSelect');
-const savedBlock = document.getElementById('savedBlock');
+// ----- Saved sequences (on this device only) -----
+const layoutName = $('layoutName');
+const layoutSelect = $('layoutSelect');
+const savedBlock = $('savedBlock');
 function readLayouts(){
   try{
     const d = JSON.parse(localStorage.getItem(LAYOUT_KEY) || '[]');
@@ -134,25 +141,25 @@ function renderLayouts(selectName){
   });
   savedBlock.hidden = list.length === 0;
 }
-document.getElementById('saveLayoutBtn').addEventListener('click', ()=>{
+$('saveLayoutBtn').addEventListener('click', ()=>{
   const name = layoutName.value.trim().slice(0, 30);
   if(!name){ say('Type a name first.'); layoutName.focus(); return; }
   const list = readLayouts().filter(l=> l.name !== name);
-  list.push({ name, segments: segments.map(sg=>({type:sg.type, minutes:sg.minutes})) });
+  list.push({ name, segments: seq.segments.map(sg=>({type:sg.type, minutes:sg.minutes})) });
   if(list.length > 20) list.shift();
   if(!writeLayouts(list)){ say('Could not save on this device.'); return; }
   layoutName.value = '';
   renderLayouts(name);
   say('Saved "' + name + '".');
 });
-document.getElementById('loadLayoutBtn').addEventListener('click', ()=>{
+$('loadLayoutBtn').addEventListener('click', ()=>{
   const l = readLayouts().find(x=> x.name === layoutSelect.value);
   if(!l) return;
-  segments = cleanSegments(l.segments);
+  seq.segments = cleanSegments(l.segments);
   segmentsChanged();
   say('Loaded "' + l.name + '": ' + seqSummary());
 });
-document.getElementById('deleteLayoutBtn').addEventListener('click', ()=>{
+$('deleteLayoutBtn').addEventListener('click', ()=>{
   const name = layoutSelect.value; if(!name) return;
   writeLayouts(readLayouts().filter(x=> x.name !== name));
   renderLayouts();

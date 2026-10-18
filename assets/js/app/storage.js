@@ -1,29 +1,36 @@
-// Remembers settings on this device (localStorage). Loads last because it reads every control.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Remembers settings on this device only (localStorage), and restores them when the page opens.
+// Loaded last on purpose: restoring a value "changes" each control, and every other file
+// must already be listening for those changes.
+import { $ } from './dom.js';
+import { settings, store } from './state.js';
+import { seq, cleanSegments } from './sequence.js';
+import { getCustomTimes, setCustomTimes, setMode } from './intervals.js';
+import { syncLengthUI, setDuration, isIdle } from './timer.js';
+import { renderSegments } from './sequence-editor.js';
 
-// ---------- Remember settings (on this device only) ----------
 const STORE_KEY = 'still.settings.v1';
-const $ = id => document.getElementById(id);
+
 function saveSettings(){
-  if(!storeReady) return;
+  if(!store.ready) return;
   try{
     localStorage.setItem(STORE_KEY, JSON.stringify({
-      scheme: schemeSelect.value, duration: durationSelect.value, customLen: customLenInput.value,
-      bell: bellSelect.value, volume: volumeRange.value,
+      scheme: $('schemeSelect').value, duration: $('durationSelect').value, customLen: $('customLenInput').value,
+      bell: $('bellSelect').value, volume: $('volumeRange').value,
       startEnabled: $('startEnabled').checked, startCount: $('startCount').value,
       endEnabled: $('endEnabled').checked, endCount: $('endCount').value, vibrate: $('vibrateEnabled').checked,
       prep: $('prepSelect').value,
       intervalEnabled: $('intervalEnabled').checked, mode: settings.mode,
-      intervalEvery: intervalEvery.value, customTimes: customTimes,
-      pattern: patternSelect.value, cycles: cyclesSelect.value,
-      segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: segments,
+      intervalEvery: $('intervalEvery').value, customTimes: getCustomTimes(),
+      pattern: $('patternSelect').value, cycles: $('cyclesSelect').value,
+      segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: seq.segments,
       pomoFocus: $('pomoFocus').value, pomoShort: $('pomoShort').value, pomoLong: $('pomoLong').value,
       pomoRounds: $('pomoRounds').value, pomoAuto: $('pomoAuto').checked,
       cuChime: $('cuChime').value
     }));
   }catch(e){}
 }
+
+// Put a saved value back into a control and tell the rest of the page it changed.
 function setVal(id, v){
   const e = $(id);
   if(!e || v === undefined || v === null) return;
@@ -48,8 +55,7 @@ function loadSettings(){
     setVal('endEnabled', d.endEnabled); setVal('endCount', d.endCount); setVal('vibrateEnabled', d.vibrate);
     setVal('prepSelect', d.prep);
     if(Array.isArray(d.customTimes)){
-      customTimes = d.customTimes.map(Number).filter(n=> n>=1 && n<=59);
-      renderChips();
+      setCustomTimes(d.customTimes.map(Number).filter(n=> n>=1 && n<=59));
     }
     if(d.mode === 'regular' || d.mode === 'custom') setMode(d.mode);
     setVal('intervalEvery', d.intervalEvery);
@@ -59,11 +65,11 @@ function loadSettings(){
     setVal('pomoFocus', d.pomoFocus); setVal('pomoShort', d.pomoShort); setVal('pomoLong', d.pomoLong);
     setVal('pomoRounds', d.pomoRounds); setVal('pomoAuto', d.pomoAuto); setVal('cuChime', d.cuChime);
     const saved = cleanSegments(d.segments);
-    if(saved){ segments = saved; renderSegments(); }
+    if(saved){ seq.segments = saved; renderSegments(); }
   }
   syncLengthUI();
-  if(phase === 'idle') setDuration();
-  storeReady = true;
+  if(isIdle()) setDuration();
+  store.ready = true;
 }
 loadSettings();
 ['change','input','click'].forEach(t=> document.addEventListener(t, ()=>{ setTimeout(saveSettings, 0); }));

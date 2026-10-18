@@ -1,16 +1,19 @@
-// Bell sounds (Web Audio), the synthesized fallback chime and vibration.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Bell sounds (Web Audio), the synthesized fallback chime, and vibration.
+import { settings } from './state.js';
 
-// ---------- Audio ----------
 let audioCtx = null;
-function ensureAudio(){
+export function ensureAudio(){
   if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
   if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
 }
+// Browsers pause audio in hidden tabs; wake it up when the tab returns.
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible' && audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+});
+
 // Real bell recordings (CC0), loaded from assets/audio/. See assets/audio/CREDITS.txt.
 const SOUND_FILES = { bowl:'assets/audio/bowl.mp3', burma:'assets/audio/burma.mp3', singing:'assets/audio/singing.mp3', gong:'assets/audio/gong.mp3', interval:'assets/audio/interval.mp3' };
-const BELL_OPTIONS = [
+export const BELL_OPTIONS = [
   { id:'bowl',    name:'Singing Bowl' },
   { id:'burma',   name:'Burmese Bell' },
   { id:'singing', name:'Singing Bell' },
@@ -60,7 +63,7 @@ function synthChime(freq, dur){
   master.gain.exponentialRampToValueAtTime(0.0001, now + dur);
 }
 
-function playSound(id, count, gain){
+export function playSound(id, count, gain){
   ensureAudio();
   const ctx = audioCtx;
   const p = buffers[id] || Promise.resolve(null);
@@ -78,24 +81,27 @@ function playSound(id, count, gain){
     }
   });
 }
-function stopBells(){
+export function stopBells(){
   activeSources.forEach(s=>{ try{ s.stop(); }catch(e){} });
   activeSources = [];
 }
 
 // kind: 'start' | 'end' | 'segment' use the chosen bell (count strikes); 'interval' is always the fixed higher bell.
-function chime(kind, count){
+export function chime(kind, count){
   if(kind === 'interval') playSound('interval', 1, INTERVAL_GAIN);
   else playSound(settings.bellSound, count || 1, 0.9);
 }
+
 // Vibration (phones and tablets whose browser supports it; most iPhones do not). Off unless switched on in Bell Settings.
-const VIBRATE_OK = typeof navigator.vibrate === 'function';
+export const VIBRATE_OK = typeof navigator.vibrate === 'function';
 const VIBRATE_PATTERNS = { start:[200], end:[300,150,300,150,300] };
 function vibrate(kind){
   if(!settings.vibrate || !VIBRATE_OK) return;
   try{ navigator.vibrate(VIBRATE_PATTERNS[kind]); }catch(e){}
 }
-function playBell(kind){
+
+// Ring (and/or vibrate for) a bell, respecting the Bell Settings switches.
+export function playBell(kind){
   if(kind==='start' || kind==='end') vibrate(kind);   // independent of whether the bell sound itself is on
   if(kind==='start' && !settings.startEnabled) return;
   if(kind==='end' && !settings.endEnabled) return;

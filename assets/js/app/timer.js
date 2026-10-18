@@ -1,8 +1,55 @@
-// Main meditation timer: length, tick loop, play / pause / reset.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+// Main meditation timer: session length, the tick loop, play / pause / reset.
+import { $ } from './dom.js';
+import { settings } from './state.js';
+import { fmt, announce, updateRing } from './display.js';
+import { ensureAudio, stopBells, playBell } from './audio.js';
+import { acquireWake, releaseWake } from './wake.js';
+import { registerActivity, pauseOthers } from './activity.js';
+import { seq, isSeq, seqTotalSeconds, segIndexAt, spokenSeg, sessionLabel, renderSeq, renderSeqIdle } from './sequence.js';
+import { resetIntervals, checkIntervals } from './intervals.js';
 
-// ---------- Timer control ----------
+// ----- Session length menu -----
+const durationSelect = $('durationSelect');
+for(let m=5; m<=60; m+=5){
+  const opt = document.createElement('option');
+  opt.value = m; opt.textContent = m + ' min';
+  if(m===20) opt.selected = true;
+  durationSelect.appendChild(opt);
+}
+[['sequence','Sit + walk'],['custom','Custom length']].forEach(([v,t])=>{
+  const opt = document.createElement('option');
+  opt.value = v; opt.textContent = t;
+  durationSelect.appendChild(opt);
+});
+const customLenRow = $('customLenRow');
+const customLenInput = $('customLenInput');
+const seqEditor = $('seqEditor');
+const segStatus = $('segStatus');
+
+const timeDisplay = $('timeDisplay');
+const phaseLabel = $('phaseLabel');
+const playBtn = $('playBtn');
+const resetBtn = $('resetBtn');
+
+// ----- State -----
+let totalSeconds = Number(durationSelect.value) * 60;
+let phase = 'idle'; // idle | prep | session
+let phaseTotal = totalSeconds;
+let phaseStartTimestamp = null;
+let phasePausedElapsed = 0;
+let isRunning = false;
+let tickHandle = null;
+
+$('prepSelect').addEventListener('change', e=>{ settings.prepSeconds = Number(e.target.value); });
+
+export const isIdle = () => phase === 'idle';
+
+function render(remaining){
+  timeDisplay.textContent = fmt(remaining);
+  updateRing(remaining, phaseTotal);
+}
+
+// ----- Timer control -----
 function readLength(){
   const v = durationSelect.value;
   if(v === 'sequence'){ totalSeconds = seqTotalSeconds(); return; }
@@ -27,14 +74,14 @@ function renderSession(elapsed){
     render(phaseTotal - elapsed);
   }
 }
-function setDuration(){
+// Re-read the chosen length and show it (only while the timer is idle).
+export function setDuration(){
   readLength();
   phasePausedElapsed = 0;
-  triggered.clear();
+  resetIntervals();
   renderIdle();
   phaseLabel.textContent = 'Ready';
 }
-const seqEditor = document.getElementById('seqEditor');
 function setLengthLocked(b){ durationSelect.disabled = b; customLenInput.disabled = b; seqEditor.disabled = b; }
 
 function stopTick(){
@@ -50,25 +97,19 @@ function tick(){
     finish();
     return;
   }
-  if(phase === 'prep'){ renderPrep(remaining); }
+  if(phase === 'prep'){ render(remaining); }
   else {
     render(remaining);
     if(isSeq()){
       renderSeq(elapsed);
       const idx = segIndexAt(elapsed);
-      if(idx > lastSeg){
-        lastSeg = idx;
+      if(idx > seq.lastSeg){
+        seq.lastSeg = idx;
         playBell('segment');
         announce(spokenSeg(idx));
       }
     }
-    triggerPoints().forEach(pt=>{
-      if(!triggered.has(pt) && elapsed >= pt){
-        triggered.add(pt);
-        playBell('interval');
-        announce('Interval bell');
-      }
-    });
+    checkIntervals(elapsed, totalSeconds);
   }
 }
 
@@ -77,8 +118,8 @@ function beginSession(){
   phaseTotal = totalSeconds;
   phasePausedElapsed = 0;
   phaseStartTimestamp = Date.now();
-  triggered.clear();
-  lastSeg = 0;
+  resetIntervals();
+  seq.lastSeg = 0;
   playBell('start');
   phaseLabel.textContent = sessionLabel(0);
   announce(isSeq() ? 'Session started. ' + spokenSeg(0) : 'Session started');
@@ -86,7 +127,7 @@ function beginSession(){
 }
 
 function play(){
-  pPause(); cuPause(); swPause();
+  pauseOthers('main');
   ensureAudio();
   acquireWake();
   if(phase === 'idle') readLength();
@@ -104,8 +145,8 @@ function play(){
     } else {
       phase = 'session';
       phaseTotal = totalSeconds;
-      triggered.clear();
-      lastSeg = 0;
+      resetIntervals();
+      seq.lastSeg = 0;
       playBell('start');
       phaseLabel.textContent = sessionLabel(0);
       announce(isSeq() ? 'Session started. ' + spokenSeg(0) : 'Session started');
@@ -148,15 +189,15 @@ function finish(){
   if(isSeq()) renderSeqIdle();
 }
 
-function reset(){
+export function reset(){
   releaseWake();
   stopBells();
   isRunning = false;
   stopTick();
   phase = 'idle';
   phasePausedElapsed = 0;
-  triggered.clear();
-  lastSeg = 0;
+  resetIntervals();
+  seq.lastSeg = 0;
   readLength();
   renderIdle();
   playBtn.innerHTML = '&#9654;';
@@ -166,15 +207,21 @@ function reset(){
   setLengthLocked(false);
 }
 
-playBtn.addEventListener('click', ()=>{ isRunning ? pause() : play(); });
-resetBtn.addEventListener('click', reset);
-function syncLengthUI(){
+// Space bar and the play button both use this.
+export function toggle(){ isRunning ? pause() : play(); }
+
+// Show or hide the custom-length box and the sit + walk editor to match the chosen length.
+export function syncLengthUI(){
   customLenRow.hidden = durationSelect.value !== 'custom';
   seqEditor.hidden = !isSeq();
   segStatus.hidden = !isSeq();
 }
+
+registerActivity('main', { isRunning: ()=> isRunning, pause: ()=>{ if(isRunning) pause(); } });
+
+playBtn.addEventListener('click', toggle);
+resetBtn.addEventListener('click', reset);
 durationSelect.addEventListener('change', ()=>{ syncLengthUI(); if(phase==='idle') setDuration(); });
 ['input','change'].forEach(t=> customLenInput.addEventListener(t, ()=>{ if(phase==='idle' && durationSelect.value==='custom') setDuration(); }));
-intervalEvery.addEventListener('change', ()=>{ triggered.clear(); });
 
 render(totalSeconds);

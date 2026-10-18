@@ -1,19 +1,20 @@
 // Breathing pacer tab.
-// Part of the Mindful Joy timer page (index.html). Plain script, not a module:
-// the files in assets/js/app/ share one scope, so load order in index.html matters.
+import { $ } from './dom.js';
+import { chime, ensureAudio } from './audio.js';
+import { acquireWake } from './wake.js';
+import { registerActivity, maybeRelease } from './activity.js';
 
-// ---------- Breathing pacer ----------
 const PATTERNS = {
   box:      [['Inhale',4],['Hold',4],['Exhale',4],['Hold',4]],
   '478':    [['Inhale',4],['Hold',7],['Exhale',8]],
   coherent: [['Inhale',5],['Exhale',5]]
 };
-const breathCircle = document.getElementById('breathCircle');
-const breathLabel = document.getElementById('breathLabel');
-const breathCycleCount = document.getElementById('breathCycleCount');
-const breathPlayBtn = document.getElementById('breathPlayBtn');
-const patternSelect = document.getElementById('patternSelect');
-const cyclesSelect = document.getElementById('cyclesSelect');
+const breathCircle = $('breathCircle');
+const breathLabel = $('breathLabel');
+const breathCycleCount = $('breathCycleCount');
+const breathPlayBtn = $('breathPlayBtn');
+const patternSelect = $('patternSelect');
+const cyclesSelect = $('cyclesSelect');
 let breathTimer = null, breathRunning = false, breathStepIdx = 0, breathCycle = 1;
 
 function setCircleSize(phaseName){
@@ -43,9 +44,9 @@ function startBreathing(){
   breathPlayBtn.innerHTML = '&#10074;&#10074;';
   breathStep();
 }
-function stopBreathing(){
+export function stopBreathing(){
+  breathRunning = false;   // first, so the screen can be released below
   maybeRelease();
-  breathRunning = false;
   if(breathTimer){ clearTimeout(breathTimer); breathTimer = null; }
   patternSelect.disabled = false; cyclesSelect.disabled = false;
   breathPlayBtn.innerHTML = '&#9654;';
@@ -53,5 +54,8 @@ function stopBreathing(){
   breathCycleCount.textContent = '';
   breathCircle.style.width = '46%'; breathCircle.style.height = '46%';
 }
+
+registerActivity('breathing', { isRunning: ()=> breathRunning, pause: stopBreathing });
+
 breathPlayBtn.addEventListener('click', ()=>{ breathRunning ? stopBreathing() : startBreathing(); });
 patternSelect.addEventListener('change', ()=>{ if(!breathRunning){ breathStepIdx=0; breathCycle=1; } });
