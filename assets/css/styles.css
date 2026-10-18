@@ -109,6 +109,7 @@
     position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
   }
   .time{ font-family:'Inter',system-ui,sans-serif; font-weight:300; font-size:3rem; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+  .kind{ font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.16em; color:var(--text-dim); opacity:.85; }
   .phase{ font-size:.8rem; color:var(--text-dim); letter-spacing:.04em; min-height:1.1em; }
 
   .duration-row{ display:flex; align-items:center; gap:10px; color:var(--text-dim); font-size:.9rem; margin-bottom:26px; }
@@ -542,3 +543,13 @@
   .switch input:disabled + .slider::before{ background:var(--text-dim); opacity:.6; left:2px; top:2px; }
   .row-label:has(input:disabled) > span:first-child{ opacity:.5; }
   .row-label:has(input:disabled) + .row-note{ opacity:.9; font-style:italic; }
+
+/* ---------- Desktop: header content sits in from both edges ----------
+   Menu, title and logo start 100px in from the left; the gear and Donations sit 200px in from the right.
+   Phones and windows under 760px keep the full-width header. */
+@media (min-width:760px){
+  .topbar{ padding-left:128px; padding-right:228px; }   /* the usual 28px plus 100px / 200px */
+  /* The title and logo sit up to 50px further from the hamburger. The extra space eases in as the
+     window widens (none at 760px, the full 50px from about 822px), so they never crowd the gear. */
+  .brand{ column-gap:calc(12px + clamp(0px, 100vw - 772px, 50px)); }
+}

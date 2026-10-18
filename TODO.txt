@@ -28,7 +28,7 @@ FEATURES
 [ ] Stretch or pose sequencer
 [x] Offline use and "install to home screen" support (PWA)
     - manifest.webmanifest, sw.js (network first), lotus app icons
-[ ] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
+[x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [ ] Share preview image for links (og:image)
 
 CONTENT
@@ -63,4 +63,5 @@ LAYOUT FIXES
 LEARNING JAVASCRIPT
 -------------------
 [ ] Move timer logic into small functions and add a few tests
-[ ] Split app.js (about 1010 lines now, Pomodoro included) into separate files by feature
+[x] Split app.js into separate files by feature (assets/js/app/)
+[x] Switch the split files to ES modules (import / export) so files stop sharing one scope

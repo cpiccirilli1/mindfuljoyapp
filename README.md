@@ -19,7 +19,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 - Header menu (Timer, Articles, About, Privacy Policy, Terms of Service; on phones it also holds Donations), a
   dismissible updates strip under the header, and a cookie notice.
 - **Works offline and installs** to the home screen or desktop (web app manifest and a service worker).
-- About page with credits and the open source notice.
+- About page with credits, the open source notice and a land acknowledgement linking to native-land.ca.
 
 ## Files
 
@@ -41,11 +41,18 @@ TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
   js/themes.js        The 23 color themes (loaded on every page)
-  js/app.js           Timer, sit/walk sequences, bells, breathing pacer, Pomodoro, Count Up, Stopwatch, settings (index.html only)
+  js/app/             The timer page (index.html only), written as ES modules: index.html loads
+                        main.js, and each file imports what it needs. One file per feature:
+                        timer, sequence, sequence-editor, intervals, audio, bell-settings, tabs,
+                        pomodoro, countup, stopwatch, breathing, reflect, theme-menu, shortcuts,
+                        storage, plus small shared ones (dom, state, display, wake, activity)
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   js/pwa.js           Registers the service worker (every page)
+  js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
+                      (checks the address, not the branch, so merging to main never marks production;
+                      edit LIVE_HOSTS if the live address changes)
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon (the lotus flower)
@@ -60,8 +67,8 @@ and serves the repository root as static assets, on https://mindfuljoy.app.
 - **`main` branch:** every push to `main` goes live on mindfuljoy.app.
 - **Other branches (for example `dev`):** every push builds a preview at its own address, found in the
   Cloudflare dashboard under the project's Deployments. The live site is not touched.
-- **Suggested workflow:** make changes on `dev`, check the preview, then merge `dev` into `main` to
-  publish.
+- **Suggested workflow:** make changes on `dev`, check the preview (it shows a "Preview build" tag), then merge
+  `dev` into `main` to publish.
 
 `wrangler.jsonc` holds the Worker name, a compatibility date, the assets folder (`./`) and an empty `previews`
 block, which the non-production deploy command (`npx wrangler preview`) requires. `.assetsignore` keeps
@@ -124,7 +131,7 @@ Third-party assets keep their own licenses:
 - Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
   current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v2`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v5`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
   request, self-host the font and delete the Google Fonts `<link>` tags.
