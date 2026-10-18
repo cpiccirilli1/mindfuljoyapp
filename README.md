@@ -14,7 +14,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **More ▾:** a menu of extra timers. **Pomodoro** (focus, short and long breaks, rounds, auto-start, a faint
   theme-tinted tomato behind the ring), **Count Up** (open-ended, optional interval chime) and **Stopwatch**
   (hundredths of a second and up to 99 laps). Only one timer runs at a time.
-- **23 color themes** (Light, Dark, High Contrast), keyboard shortcuts, screen reader announcements, and a screen
+- **25 color themes** (Light, Dark, High Contrast, and two Pride themes with seven-segment rainbow timer rings), keyboard shortcuts, screen reader announcements, and a screen
   wake lock during sessions.
 - Header menu (Timer, Articles, About, Privacy Policy, Terms of Service; on phones it also holds Donations), a
   dismissible updates strip under the header, and a cookie notice.
@@ -40,7 +40,7 @@ LICENSE               MIT License
 TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
-  js/themes.js        The 23 color themes (loaded on every page)
+  js/themes.js        The 25 color themes (loaded on every page)
   js/app/             The timer page (index.html only), written as ES modules: index.html loads
                         main.js, and each file imports what it needs. One file per feature:
                         timer, sequence, sequence-editor, intervals, audio, bell-settings, tabs,
@@ -110,8 +110,8 @@ The updates strip directly under the header is set by the `UPDATE` object in the
 
 ## Color themes
 
-There are 23 themes in three groups (Light, Dark, High Contrast). They all live in `assets/js/themes.js`.
-Each theme is one line with an `id`, a `group`, a `name` and its colors. To add or change a theme, edit that
+There are 25 themes in four groups (Light, Dark, High Contrast, Pride). They all live in `assets/js/themes.js`.
+Each theme is one line with an `id`, a `group`, a `name` and its colors. The Pride themes also have a `rainbow` list of seven colors (red to violet) that draws the segmented timer rings, plus a `header` gradient; leave `rainbow` out and a theme gets the normal single-color ring. To add or change a theme, edit that
 file only: the menu on every page builds itself from it. Keep the `id` values of existing themes unchanged,
 because visitors' saved choices refer to them. For readable text, keep the dim and accent colors at least
 4.5:1 against the background.

@@ -553,3 +553,14 @@
      window widens (none at 760px, the full 50px from about 822px), so they never crowd the gear. */
   .brand{ column-gap:calc(12px + clamp(0px, 100vw - 772px, 50px)); }
 }
+
+/* ---------- Pride themes: rainbow timer rings ----------
+   display.js draws seven colored arcs on every ring and themes.js sets --rb0 ... --rb6 plus the "pride"
+   class on <html>. In other themes the rainbow stays hidden and the normal single-color ring shows. */
+.rainbow-ring{ display:none; }
+html.pride .rainbow-ring{ display:inline; }
+html.pride circle.progress{ display:none; }
+.rb{ fill:none; stroke-width:6; }
+.ring-mask-circle{ fill:none; stroke:#fff; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset .25s linear; }
+/* The Pomodoro tomato stays red in the Pride themes (instead of turning blue like the buttons). */
+html.pride .tomato-bg{ --accent:#e5484d; }
