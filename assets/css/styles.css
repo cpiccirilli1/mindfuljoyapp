@@ -549,4 +549,7 @@
    Phones and windows under 760px keep the full-width header. */
 @media (min-width:760px){
   .topbar{ padding-left:128px; padding-right:228px; }   /* the usual 28px plus 100px / 200px */
+  /* The title and logo sit up to 50px further from the hamburger. The extra space eases in as the
+     window widens (none at 760px, the full 50px from about 822px), so they never crowd the gear. */
+  .brand{ column-gap:calc(12px + clamp(0px, 100vw - 772px, 50px)); }
 }
