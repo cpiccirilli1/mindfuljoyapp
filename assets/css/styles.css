@@ -543,3 +543,9 @@
   .switch input:disabled + .slider::before{ background:var(--text-dim); opacity:.6; left:2px; top:2px; }
   .row-label:has(input:disabled) > span:first-child{ opacity:.5; }
   .row-label:has(input:disabled) + .row-note{ opacity:.9; font-style:italic; }
+
+/* ---------- Desktop: gear and Donations sit 200px in from the right edge ----------
+   The menu, title and logo stay at the left. Phones and small windows keep the full-width header. */
+@media (min-width:760px){
+  .topbar{ padding-right:228px; }   /* the usual 28px plus 200px */
+}
