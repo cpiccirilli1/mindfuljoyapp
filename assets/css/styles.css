@@ -82,12 +82,18 @@
   .tab-panel.active{ display:flex; }
 
   .breath-wrap{ position:relative; width:min(70vw,260px); height:min(70vw,260px); margin:12px 0 28px; display:flex; align-items:center; justify-content:center; }
+  /* The circle is drawn at full size and scaled with transform (smooth, and the label stays the same size).
+     breathing.js sets the scale and how many seconds the change takes, so an inhale or exhale lasts
+     exactly as long as the step. MIN_SCALE in breathing.js must match the starting scale here. */
   .breath-circle{
-    width:46%; height:46%; border-radius:50%; background:var(--accent-soft); border:1px solid var(--accent);
-    display:flex; align-items:center; justify-content:center; text-align:center; padding:12px;
-    transition:width 1s ease-in-out, height 1s ease-in-out;
+    position:absolute; width:72%; height:72%; border-radius:50%; background:var(--accent-soft); border:1px solid var(--accent);
+    transform:scale(.64); transition:transform .6s cubic-bezier(.37,0,.63,1); will-change:transform;
   }
-  .breath-circle span{ font-size:.85rem; color:var(--text); }
+  /* faint outline at full size, so you can see where the circle is headed */
+  .breath-wrap::before{
+    content:''; position:absolute; width:72%; height:72%; border-radius:50%; border:1px dashed var(--ring-track); box-sizing:border-box;
+  }
+  .breath-label{ position:relative; font-size:.95rem; color:var(--text); text-align:center; }
   .cycle-count{ font-size:.78rem; color:var(--text-dim); margin-top:14px; }
 
   .reflect-card{
@@ -564,3 +570,7 @@ html.pride circle.progress{ display:none; }
 .ring-mask-circle{ fill:none; stroke:#fff; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset .25s linear; }
 /* The Pomodoro tomato stays red in the Pride themes (instead of turning blue like the buttons). */
 html.pride .tomato-bg{ --accent:#e5484d; }
+
+/* Breathe tab: Cycles and Sound share one row (and wrap on very narrow screens), so the extra control does not push the circle down. */
+.breath-options{ flex-wrap:wrap; justify-content:center; gap:10px 12px; }
+.breath-options label + select + label{ margin-left:8px; }

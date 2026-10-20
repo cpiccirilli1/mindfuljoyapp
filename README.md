@@ -10,7 +10,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
   bell (repeating or custom times), volume, a preparation delay, and an optional vibration at the start and end
   (off by default; needs a browser that supports the Vibration API, which most iPhones lack).
-- **Breathe:** box, 4-7-8 and coherent breathing pacer. **Reflect:** reflection prompts.
+- **Breathe:** box, 4-7-8 and coherent breathing pacer. The circle grows smoothly for the whole inhale and shrinks for the whole exhale. Soft tones (made in the browser, so no sound files or licenses; switch them off with the Sound menu) mark inhale, hold, exhale and the end. **Reflect:** reflection prompts.
 - **More ▾:** a menu of extra timers. **Pomodoro** (focus, short and long breaks, rounds, auto-start, a faint
   theme-tinted tomato behind the ring), **Count Up** (open-ended, optional interval chime) and **Stopwatch**
   (hundredths of a second and up to 99 laps). Only one timer runs at a time.

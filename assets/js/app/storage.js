@@ -21,7 +21,7 @@ function saveSettings(){
       prep: $('prepSelect').value,
       intervalEnabled: $('intervalEnabled').checked, mode: settings.mode,
       intervalEvery: $('intervalEvery').value, customTimes: getCustomTimes(),
-      pattern: $('patternSelect').value, cycles: $('cyclesSelect').value,
+      pattern: $('patternSelect').value, cycles: $('cyclesSelect').value, breathSound: $('breathSoundSelect').value,
       segEnabled: $('segEnabled').checked, segCount: $('segCount').value, segments: seq.segments,
       pomoFocus: $('pomoFocus').value, pomoShort: $('pomoShort').value, pomoLong: $('pomoLong').value,
       pomoRounds: $('pomoRounds').value, pomoAuto: $('pomoAuto').checked,
@@ -60,7 +60,7 @@ function loadSettings(){
     if(d.mode === 'regular' || d.mode === 'custom') setMode(d.mode);
     setVal('intervalEvery', d.intervalEvery);
     setVal('intervalEnabled', d.intervalEnabled);
-    setVal('patternSelect', d.pattern); setVal('cyclesSelect', d.cycles);
+    setVal('patternSelect', d.pattern); setVal('cyclesSelect', d.cycles); setVal('breathSoundSelect', d.breathSound);
     setVal('segEnabled', d.segEnabled); setVal('segCount', d.segCount);
     setVal('pomoFocus', d.pomoFocus); setVal('pomoShort', d.pomoShort); setVal('pomoLong', d.pomoLong);
     setVal('pomoRounds', d.pomoRounds); setVal('pomoAuto', d.pomoAuto); setVal('cuChime', d.cuChime);

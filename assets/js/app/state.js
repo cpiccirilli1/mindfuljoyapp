@@ -5,7 +5,8 @@
 export const settings = {
   startEnabled: true, endEnabled: true, intervalEnabled: false, mode: 'regular',
   prepSeconds: 5, bellSound: 'bowl', startCount: 1, endCount: 1,
-  segEnabled: true, segCount: 1, volume: 1, vibrate: false
+  segEnabled: true, segCount: 1, volume: 1, vibrate: false,
+  breathSound: true   // soft tones for the breathing pacer (separate from the bells)
 };
 
 // ready becomes true once saved settings have been loaded. Until then, changing a control

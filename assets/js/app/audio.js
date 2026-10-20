@@ -110,3 +110,41 @@ export function playBell(kind){
   chime(kind, kind==='start' ? settings.startCount : kind==='end' ? settings.endCount : kind==='segment' ? settings.segCount : 1);
 }
 loadSounds();
+
+// ----- Gentle cues for the breathing pacer -----
+// Short, soft tones made right in the browser (a sine wave with a gentle fade in and out), so there are
+// no sound files and nothing to license. Inhale glides up, exhale glides down, hold is one steady note.
+// Each note: from/to = starting and ending pitch in Hz, at = delay in seconds, len = length in seconds.
+const BREATH_CUES = {
+  inhale: [{ from:330, to:440, at:0,   len:0.8 }],
+  hold:   [{ from:392, to:392, at:0,   len:0.5, soft:0.7 }],
+  exhale: [{ from:440, to:330, at:0,   len:0.8 }],
+  done:   [{ from:392, to:392, at:0,   len:0.9 }, { from:523, to:523, at:0.22, len:1.2 }]
+};
+const BREATH_GAIN = 0.22;   // quiet on purpose; the Bell Settings volume scales it
+export function playBreathCue(kind){
+  if(!settings.breathSound) return;
+  const notes = BREATH_CUES[kind];
+  if(!notes) return;
+  try{ ensureAudio(); }catch(e){ return; }
+  const ctx = audioCtx, t0 = ctx.currentTime + 0.02;
+  const peak = Math.max(0.0001, BREATH_GAIN * settings.volume);
+  notes.forEach(n=>{
+    const start = t0 + n.at, end = start + n.len;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, start);
+    master.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak * (n.soft || 1)), start + 0.06);
+    master.gain.exponentialRampToValueAtTime(0.0001, end);
+    master.connect(ctx.destination);
+    // the note itself plus a faint octave above it, for a rounder "boop"
+    [[1, 1], [2, 0.16]].forEach(([mult, level])=>{
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.from * mult, start);
+      if(n.to !== n.from) osc.frequency.exponentialRampToValueAtTime(n.to * mult, start + n.len * 0.7);
+      const g = ctx.createGain(); g.gain.value = level;
+      osc.connect(g).connect(master);
+      osc.start(start); osc.stop(end + 0.05);
+    });
+  });
+}
