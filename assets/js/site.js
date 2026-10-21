@@ -7,7 +7,8 @@
   var menu = document.getElementById('themeMenu');
   var current = MJ.find(MJ.savedScheme()) || MJ.find('sage');
   MJ.fillSelect(select, current.id);
-  function open(){ pop.hidden = false; btn.setAttribute('aria-expanded','true'); }
+  var picker = MJ.buildPicker(select);
+  function open(){ picker.sync(); pop.hidden = false; btn.setAttribute('aria-expanded','true'); }
   function close(ret){
     var was = !pop.hidden;
     pop.hidden = true; btn.setAttribute('aria-expanded','false');

@@ -8,6 +8,7 @@ const applyScheme = window.MJ.applyScheme;
 
 const schemeSelect = $('schemeSelect');
 window.MJ.fillSelect(schemeSelect, 'sage');
+const picker = window.MJ.buildPicker(schemeSelect);
 schemeSelect.addEventListener('change', ()=>{
   const s = SCHEMES.find(x=>x.id===schemeSelect.value);
   if(s) applyScheme(s);
@@ -19,7 +20,7 @@ const themeBtn = $('themeBtn');
 const themePop = $('themePop');
 const themeMenu = $('themeMenu');
 export const isThemeMenuOpen = () => !themePop.hidden;
-function openThemeMenu(){ themePop.hidden = false; themeBtn.setAttribute('aria-expanded','true'); }
+function openThemeMenu(){ picker.sync(); themePop.hidden = false; themeBtn.setAttribute('aria-expanded','true'); }
 export function closeThemeMenu(returnFocus){
   const wasOpen = !themePop.hidden;
   themePop.hidden = true; themeBtn.setAttribute('aria-expanded','false');
