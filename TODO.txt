@@ -29,7 +29,8 @@ FEATURES
 [x] Offline use and "install to home screen" support (PWA)
     - manifest.webmanifest, sw.js (network first), lotus app icons
 [x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
-[ ] Share preview image for links (og:image)
+[x] Share preview image for links (og:image)
+    - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
 
 CONTENT
 -------

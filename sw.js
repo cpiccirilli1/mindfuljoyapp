@@ -7,7 +7,7 @@ const PRECACHE = [
   'assets/css/styles.css',
   'assets/js/app/activity.js', 'assets/js/app/audio.js', 'assets/js/app/bell-settings.js', 'assets/js/app/breathing.js', 'assets/js/app/countup.js', 'assets/js/app/display.js', 'assets/js/app/dom.js', 'assets/js/app/intervals.js', 'assets/js/app/main.js', 'assets/js/app/pomodoro.js', 'assets/js/app/reflect.js', 'assets/js/app/sequence-editor.js', 'assets/js/app/sequence.js', 'assets/js/app/shortcuts.js', 'assets/js/app/state.js', 'assets/js/app/stopwatch.js', 'assets/js/app/storage.js', 'assets/js/app/tabs.js', 'assets/js/app/theme-menu.js', 'assets/js/app/timer.js', 'assets/js/app/wake.js',
   'assets/js/menu.js', 'assets/js/consent.js', 'assets/js/site.js', 'assets/js/themes.js', 'assets/js/pwa.js', 'assets/js/preview.js',
-  'assets/favicon.svg', 'assets/icons/icon.svg', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png',
+  'assets/og-image.png', 'assets/favicon.svg', 'assets/icons/icon.svg', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png',
   'assets/audio/bowl.mp3', 'assets/audio/burma.mp3', 'assets/audio/singing.mp3', 'assets/audio/gong.mp3', 'assets/audio/interval.mp3'
 ];
 
