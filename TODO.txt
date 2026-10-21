@@ -43,7 +43,7 @@ SITE / OPS
 ----------
 [ ] When articles are published: add them to About features and to the
     Terms (written content is general information, not medical advice)
-[ ] Merge dev into main after the dev preview is approved
+[x] Merge dev into main after the dev preview is approved (done Oct 18)
 [ ] After AdSense approval: replace the current cookie banner (Accept /
     Reject-to-google.com) with AdSense's own consent message
     (Privacy & messaging). Keep the current banner until then.

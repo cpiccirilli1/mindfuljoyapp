@@ -139,7 +139,7 @@
       <option value="coherent">Coherent (5-5)</option>
     </select>
   </div>
-  <div class="duration-row">
+  <div class="duration-row breath-options">
     <label for="cyclesSelect">Cycles</label>
     <select id="cyclesSelect">
       <option value="3">3</option>
@@ -147,9 +147,15 @@
       <option value="8">8</option>
       <option value="12">12</option>
     </select>
+    <label for="breathSoundSelect">Sound</label>
+    <select id="breathSoundSelect">
+      <option value="on" selected>On</option>
+      <option value="off">Off</option>
+    </select>
   </div>
   <div class="breath-wrap">
-    <div class="breath-circle" id="breathCircle"><span id="breathLabel">Ready</span></div>
+    <div class="breath-circle" id="breathCircle"></div>
+    <span class="breath-label" id="breathLabel">Ready</span>
   </div>
   <div class="cycle-count" id="breathCycleCount"></div>
   <div class="controls" style="margin-top:14px;">

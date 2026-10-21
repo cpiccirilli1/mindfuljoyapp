@@ -23,7 +23,14 @@
     { id:'midnight', group:'Dark', name:'Midnight', bg:'#0b1020', surface:'#131a2e', text:'#e4e9f5', dim:'#93a0bd', accent:'#7f9cf0', soft:'rgba(127,156,240,.16)', track:'#212a45', border:'#232c48' },
     { id:'cocoa', group:'Dark', name:'Cocoa', bg:'#1a1410', surface:'#241c16', text:'#efe6dd', dim:'#ad9a88', accent:'#d19a6a', soft:'rgba(209,154,106,.16)', track:'#382d24', border:'#3a2f26' },
     { id:'peach', group:'Light', name:'Peach', bg:'#fbf1ea', surface:'#ffffff', text:'#3b2b22', dim:'#7d6352', accent:'#a85830', soft:'rgba(168,88,48,.14)', track:'#f1e1d6', border:'#eddccf' },
-    { id:'moss', group:'Light', name:'Moss', bg:'#f1f2e8', surface:'#ffffff', text:'#2c3022', dim:'#6b7058', accent:'#66752f', soft:'rgba(102,117,47,.14)', track:'#e3e6d3', border:'#dfe2cd' }
+    { id:'moss', group:'Light', name:'Moss', bg:'#f1f2e8', surface:'#ffffff', text:'#2c3022', dim:'#6b7058', accent:'#66752f', soft:'rgba(102,117,47,.14)', track:'#e3e6d3', border:'#dfe2cd' },
+    // Pride themes: blue buttons, a rainbow header band, and every timer ring drawn in seven segments (red, orange, yellow, green, blue, indigo, violet).
+    { id:'pride-light', group:'Pride', name:'Pride Light', bg:'#f4f1fb', surface:'#ffffff', text:'#2b2740', dim:'#6c6788', accent:'#3f68d0', soft:'rgba(63,104,208,.14)', track:'#e6e1f3', border:'#e0dbee',
+      header:'linear-gradient(90deg,#f8cfd0,#fbe0c3,#fbf0b8,#cfeadb,#c7defa,#cfd2f1,#e2cdf0)',
+      rainbow:['#f2a6a8','#f6c28e','#f4e08c','#a9d9b9','#a2c8f0','#a5abe3','#c9a6e2'] },
+    { id:'pride-dark', group:'Pride', name:'Pride Dark', bg:'#17181c', surface:'#202228', text:'#eeeff3', dim:'#a0a3ad', accent:'#5f9bf0', soft:'rgba(95,155,240,.18)', track:'#2e3038', border:'#32343c',
+      header:'linear-gradient(90deg,#5b2b31,#5d3d22,#5a4f1f,#27483a,#243f5e,#2b3166,#44295f)',
+      rainbow:['#e5484d','#f08c2a','#f2cc3d','#4fb477','#3f8fe0','#4a55c9','#9a5cc8'] }
   ];
   function applyScheme(s){
     const r = document.documentElement.style;
@@ -31,12 +38,15 @@
     r.setProperty('--text-dim', s.dim); r.setProperty('--accent', s.accent); r.setProperty('--accent-soft', s.soft);
     r.setProperty('--ring-track', s.track); r.setProperty('--border', s.border);
     if(s.header) r.setProperty('--header', s.header); else r.removeProperty('--header');
+    // Themes with a rainbow draw their timer rings in seven colored segments (see display.js and styles.css).
+    if(s.rainbow){ s.rainbow.forEach(function(c, i){ r.setProperty('--rb' + i, c); }); document.documentElement.classList.add('pride'); }
+    else { document.documentElement.classList.remove('pride'); }
     var meta = document.querySelector('meta[name="theme-color"]');
     if(meta) meta.setAttribute('content', s.bg);
   }
-  // Fills a <select> with the themes, grouped (Light / Dark / High Contrast).
+  // Fills a <select> with the themes, grouped (Light / Dark / High Contrast / Pride).
   function fillSelect(select, selectedId){
-    ['Light','Dark','High Contrast'].forEach(function(g){
+    ['Light','Dark','High Contrast','Pride'].forEach(function(g){
       var grp = document.createElement('optgroup');
       grp.label = g;
       SCHEMES.forEach(function(s){
