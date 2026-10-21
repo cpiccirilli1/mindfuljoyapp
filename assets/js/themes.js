@@ -2,8 +2,8 @@
 (function(){
   var SCHEMES = [
     { id:'dark', group:'Dark',     name:'Dark',     bg:'#121214', surface:'#1b1b1e', text:'#e9e9ea', dim:'#97979c', accent:'#8a8f99', soft:'rgba(138,143,153,.16)', track:'#2a2a2e', border:'#2e2e33' },
-    { id:'amoled', group:'High Contrast',   name:'High Contrast', bg:'#000000', surface:'#000000', text:'#ffffff', dim:'#c8c8c8', accent:'#8cf0ae', soft:'rgba(140,240,174,.22)', track:'#404040', border:'#707070', header:'#000000' },
-    { id:'tranquil', group:'Dark', name:'Tranquil Green', bg:'#0f1c17', surface:'#16261f', text:'#e4ede7', dim:'#8da99a', accent:'#6fae84', soft:'rgba(111,174,132,.16)', track:'#223830', border:'#26382f' },
+    { id:'amoled', group:'Dark',   name:'High Contrast', bg:'#000000', surface:'#000000', text:'#ffffff', dim:'#c8c8c8', accent:'#8cf0ae', soft:'rgba(140,240,174,.22)', track:'#404040', border:'#707070', header:'#000000' },
+    { id:'tranquil', group:'Dark', name:'Tranquil Forest', bg:'#0f1c17', surface:'#16261f', text:'#e4ede7', dim:'#8da99a', accent:'#6fae84', soft:'rgba(111,174,132,.16)', track:'#223830', border:'#26382f' },
     { id:'sage', group:'Light',     name:'Sage',     bg:'#f3f5ef', surface:'#ffffff', text:'#2d332c', dim:'#798577', accent:'#7a9a7e', soft:'rgba(122,154,126,.14)', track:'#e3e8dc', border:'#dfe4d8' },
     { id:'sky', group:'Light',      name:'Sky',      bg:'#eef4f7', surface:'#ffffff', text:'#27323a', dim:'#71838c', accent:'#6fa3b8', soft:'rgba(111,163,184,.14)', track:'#dbe7ec', border:'#d8e4e9' },
     { id:'lavender', group:'Light', name:'Lavender', bg:'#f4f1f8', surface:'#ffffff', text:'#322c3c', dim:'#857c92', accent:'#9686b8', soft:'rgba(150,134,184,.14)', track:'#e5e0ee', border:'#e1dbea' },
@@ -44,9 +44,12 @@
     var meta = document.querySelector('meta[name="theme-color"]');
     if(meta) meta.setAttribute('content', s.bg);
   }
-  // Fills a <select> with the themes, grouped (Light / Dark / High Contrast / Pride).
+  var GROUPS = ['Light','Dark','Pride'];
+
+  // Fills a <select> with the themes, grouped (Light / Dark / Pride).
+  // The select is the one place that holds the chosen theme; the picker below drives it.
   function fillSelect(select, selectedId){
-    ['Light','Dark','High Contrast','Pride'].forEach(function(g){
+    GROUPS.forEach(function(g){
       var grp = document.createElement('optgroup');
       grp.label = g;
       SCHEMES.forEach(function(s){
@@ -60,12 +63,87 @@
     });
   }
 
+  // The theme picker: one collapsible section per group. Opening a section closes the others.
+  // It sits where the plain <select> was, and the select stays in the page (hidden) as the source of truth:
+  // choosing a theme sets select.value and fires its "change" event, so saving and applying work as before.
+  // Returns { sync }: call sync() when the menu opens so the picker shows the current theme.
+  function buildPicker(select){
+    var box = document.createElement('div');
+    box.className = 'theme-acc';
+    var sections = [];
+    GROUPS.forEach(function(g, gi){
+      var themes = SCHEMES.filter(function(s){ return s.group === g; });
+      if(!themes.length) return;
+      var head = document.createElement('button');
+      head.type = 'button';
+      head.className = 'acc-head';
+      head.id = 'themeAccHead' + gi;
+      head.setAttribute('aria-expanded', 'false');
+      head.setAttribute('aria-controls', 'themeAccList' + gi);
+      head.innerHTML = '<span>' + g + '</span><span class="acc-count">' + themes.length + '<i aria-hidden="true"></i></span>';
+      var list = document.createElement('div');
+      list.className = 'acc-list';
+      list.id = 'themeAccList' + gi;
+      list.setAttribute('role', 'group');
+      list.setAttribute('aria-labelledby', head.id);
+      list.hidden = true;
+      themes.forEach(function(s){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'acc-item';
+        b.dataset.id = s.id;
+        b.setAttribute('aria-pressed', 'false');
+        var dot = document.createElement('span');
+        dot.className = 'acc-dot';
+        dot.style.background = s.accent;
+        b.appendChild(dot);
+        b.appendChild(document.createTextNode(s.name));
+        b.addEventListener('click', function(){
+          select.value = s.id;
+          select.dispatchEvent(new Event('change', { bubbles:true }));
+        });
+        list.appendChild(b);
+      });
+      head.addEventListener('click', function(){ openSection(sections.indexOf(sec)); });
+      var sec = { group:g, head:head, list:list };
+      sections.push(sec);
+      box.appendChild(head);
+      box.appendChild(list);
+    });
+    function openSection(index){
+      sections.forEach(function(sec, i){
+        var open = i === index && sec.list.hidden;   // clicking the open section closes it
+        sec.list.hidden = !open;
+        sec.head.setAttribute('aria-expanded', String(open));
+      });
+    }
+    function sync(){
+      var current = select.value, at = 0, found = null;
+      sections.forEach(function(sec, i){
+        Array.prototype.forEach.call(sec.list.children, function(b){
+          var on = b.dataset.id === current;
+          b.setAttribute('aria-pressed', String(on));
+          b.classList.toggle('on', on);
+          if(on){ at = i; found = b; }
+        });
+      });
+      sections.forEach(function(sec){ sec.list.hidden = true; sec.head.setAttribute('aria-expanded', 'false'); });
+      openSection(at);
+      if(found) found.scrollIntoView({ block:'nearest' });
+    }
+    // Replace the label + select in the page with the picker (the select stays, hidden).
+    var label = select.parentNode.querySelector('label[for="' + select.id + '"]');
+    if(label){ label.textContent = 'Color theme'; label.classList.add('acc-title'); }
+    select.hidden = true;
+    select.parentNode.insertBefore(box, select.nextSibling);
+    return { sync: sync };
+  }
 
   var STORE_KEY = 'still.settings.v1';
   function savedScheme(){
     try{ var d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); return d && d.scheme; }catch(e){ return null; }
   }
   function find(id){ for(var i=0;i<SCHEMES.length;i++){ if(SCHEMES[i].id===id) return SCHEMES[i]; } return null; }
-  window.MJ = { SCHEMES:SCHEMES, applyScheme:applyScheme, fillSelect:fillSelect, STORE_KEY:STORE_KEY, savedScheme:savedScheme, find:find };
+  window.MJ = { SCHEMES:SCHEMES, applyScheme:applyScheme, fillSelect:fillSelect, buildPicker:buildPicker, STORE_KEY:STORE_KEY, savedScheme:savedScheme, find:find };
   applyScheme(find(savedScheme()) || find('sage'));
 })();
