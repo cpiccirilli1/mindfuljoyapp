@@ -10,6 +10,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
   bell (repeating or custom times), volume, a preparation delay, and an optional vibration at the start and end
   (off by default; needs a browser that supports the Vibration API, which most iPhones lack).
+- **History:** streaks, a past-7-days bar chart, a 12-week calendar and recent sessions, kept on the device, under the More menu. Export and Import (gear menu) move it to another device.
 - **Breathe:** box, 4-7-8 and coherent breathing pacer. The circle grows smoothly for the whole inhale and shrinks for the whole exhale. Soft tones (made in the browser, so no sound files or licenses; switch them off with the Sound menu) mark inhale, hold, exhale and the end. **Reflect:** reflection prompts.
 - **More ▾:** a menu of extra timers. **Pomodoro** (focus, short and long breaks, rounds, auto-start, a faint
   theme-tinted tomato behind the ring), **Count Up** (open-ended, optional interval chime) and **Stopwatch**
@@ -37,6 +38,7 @@ sw.js                 Service worker: saves the site for offline use (network fi
 wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
 .assetsignore         Repo files that Cloudflare should NOT publish on the site
 LICENSE               MIT License
+tests/                Unit tests for the history maths. Run: node --test tests/history.test.mjs
 TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
@@ -44,8 +46,10 @@ assets/
   js/app/             The timer page (index.html only), written as ES modules: index.html loads
                         main.js, and each file imports what it needs. One file per feature:
                         timer, sequence, sequence-editor, intervals, audio, bell-settings, tabs,
-                        pomodoro, countup, stopwatch, breathing, reflect, theme-menu, shortcuts,
-                        storage, plus small shared ones (dom, state, display, wake, activity)
+                        pomodoro, countup, stopwatch, breathing, reflect, history, theme-menu, shortcuts,
+                        storage, plus small shared ones (dom, state, display, wake, activity).
+                        history-store.js is the history data and maths (no page code, so the tests can
+                        run it); data-menu.js adds Export / Import to the gear menu on every page
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
@@ -129,9 +133,11 @@ Third-party assets keep their own licenses:
 ## Notes
 
 - Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
-  current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
+  current sit/walk segments), `still.layouts.v1` (saved layouts), `mj.history.v1` (finished sessions: id, end time,
+  length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
+  backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v5`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v6`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
   request, self-host the font and delete the Google Fonts `<link>` tags.

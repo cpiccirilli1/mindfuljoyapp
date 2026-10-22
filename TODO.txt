@@ -13,7 +13,13 @@ FEATURES
     - Show the current segment name and the time left in it
     - Save segment layouts on the device (localStorage)
     - Presets for common sit / walk patterns
-[ ] Session history and streaks, kept on the device
+[x] Session history and streaks, kept on the device
+    - History page under More: streaks, past 7 days, 12-week calendar, recent
+    - Records main timer, sit + walk and breathing sessions (a minute or more);
+      a day counts toward a streak at 5 minutes or more
+[x] Export / Import of history (and optionally settings) in the gear menu
+[ ] History ideas: weekly goal, per-kind totals, end-of-session screen with a
+    gentle Ko-fi note, optional streak line under the timer, copy/paste backup
 [ ] Ambient sound options (rain, ocean, etc.)
 [x] Focus / Pomodoro timer (under the "More" menu; room for more timers there)
     - Focus, short break, long break and rounds are adjustable
@@ -63,6 +69,7 @@ LAYOUT FIXES
 
 LEARNING JAVASCRIPT
 -------------------
-[ ] Move timer logic into small functions and add a few tests
+[~] Move timer logic into small functions and add a few tests
+    - Started: tests/history.test.mjs (node --test tests/history.test.mjs); timer logic still to do
 [x] Split app.js into separate files by feature (assets/js/app/)
 [x] Switch the split files to ES modules (import / export) so files stop sharing one scope

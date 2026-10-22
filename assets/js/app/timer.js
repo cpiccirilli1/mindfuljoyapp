@@ -7,6 +7,7 @@ import { acquireWake, releaseWake } from './wake.js';
 import { registerActivity, pauseOthers } from './activity.js';
 import { seq, isSeq, seqTotalSeconds, segIndexAt, spokenSeg, sessionLabel, renderSeq, renderSeqIdle } from './sequence.js';
 import { resetIntervals, checkIntervals } from './intervals.js';
+import { recordSession } from './history.js';
 
 // ----- Session length menu -----
 const durationSelect = $('durationSelect');
@@ -182,6 +183,7 @@ function finish(){
   playBtn.setAttribute('aria-label','Start');
   phaseLabel.textContent = 'Complete';
   announce('Session complete');
+  recordSession(isSeq() ? 'seq' : 'timer', totalSeconds);
   phase = 'idle';
   phaseTotal = totalSeconds;
   phasePausedElapsed = 0;
@@ -190,6 +192,11 @@ function finish(){
 }
 
 export function reset(){
+  // Ending a session early still counts for the time actually sat (history ignores anything under a minute).
+  if(phase === 'session'){
+    const elapsed = isRunning ? (Date.now() - phaseStartTimestamp)/1000 : phasePausedElapsed;
+    recordSession(isSeq() ? 'seq' : 'timer', Math.min(elapsed, totalSeconds));
+  }
   releaseWake();
   stopBells();
   isRunning = false;

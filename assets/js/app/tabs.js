@@ -1,10 +1,10 @@
-// Tabs (Timer / Breathe / Reflect) and the "More" menu that opens Pomodoro, Count Up and Stopwatch.
+// Tabs (Timer / Breathe / Reflect) and the "More" menu that opens Pomodoro, Count Up, Stopwatch and History.
 import { $ } from './dom.js';
 import { stopBreathing } from './breathing.js';
 
 const tabBtns = { timer: $('tabBtnTimer'), breathe: $('tabBtnBreathe'), reflect: $('tabBtnReflect') };
 const moreBtn = $('moreBtn');
-const tabPanels = { timer: $('panel-timer'), breathe: $('panel-breathe'), reflect: $('panel-reflect'), pomodoro: $('panel-pomodoro'), countup: $('panel-countup'), stopwatch: $('panel-stopwatch') };
+const tabPanels = { timer: $('panel-timer'), breathe: $('panel-breathe'), reflect: $('panel-reflect'), pomodoro: $('panel-pomodoro'), countup: $('panel-countup'), stopwatch: $('panel-stopwatch'), history: $('panel-history') };
 
 export const isTabActive = name => tabPanels[name].classList.contains('active');
 
@@ -13,8 +13,9 @@ function showTab(name){
     tabPanels[k].classList.toggle('active', k===name);
     if(tabBtns[k]){ tabBtns[k].classList.toggle('active', k===name); tabBtns[k].setAttribute('aria-pressed', String(k===name)); }
   });
-  moreBtn.classList.toggle('active', name === 'pomodoro' || name === 'countup' || name === 'stopwatch');
+  moreBtn.classList.toggle('active', name === 'pomodoro' || name === 'countup' || name === 'stopwatch' || name === 'history');
   if(name !== 'breathe') stopBreathing();
+  if(name === 'history') document.dispatchEvent(new Event('mj:show-history'));
 }
 
 // ----- "More timers" menu -----

@@ -491,6 +491,7 @@
   .more-item:hover, .more-item:focus-visible{ background:var(--accent-soft); }
   .more-item strong{ font-size:.95rem; font-weight:600; }
   .more-item span{ font-size:.78rem; color:var(--text-dim); }
+  .more-group{ margin:8px 6px 2px; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--border); padding-top:10px; }
   .more-soon{ margin:6px 6px 2px; font-size:.74rem; color:var(--text-dim); border-top:1px solid var(--border); padding-top:8px; }
   .pomo-grid{
     display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px 14px;
@@ -596,3 +597,53 @@ html.pride .tomato-bg{ --accent:#e5484d; }
 /* Breathe tab: Cycles and Sound share one row (and wrap on very narrow screens), so the extra control does not push the circle down. */
 .breath-options{ flex-wrap:wrap; justify-content:center; gap:10px 12px; }
 .breath-options label + select + label{ margin-left:8px; }
+
+  /* ---------- History page (More menu) ---------- */
+  .hist{ width:100%; padding:0 2px; }
+  .hist-title{ font-family:'Inter',system-ui,sans-serif; font-weight:500; font-size:1.25rem; margin:0 0 14px; display:flex; justify-content:space-between; align-items:baseline; }
+  .hist-title small{ font-size:.76rem; color:var(--text-dim); font-weight:400; }
+  .hist svg{ transform:none; height:auto; display:block; }   /* the page-wide svg rule is for the timer rings */
+  .hist-tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .hist-tile{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 10px 9px; min-width:0; }
+  .hist-tile b{ display:block; font-size:1.25rem; font-weight:500; line-height:1.15; white-space:nowrap; }
+  .hist-tile span{ font-size:.72rem; color:var(--text-dim); letter-spacing:.02em; }
+  .hist-card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 12px 10px; margin-bottom:12px; }
+  .hist-card h3{ font-size:.8rem; font-weight:600; margin:0 0 8px; display:flex; justify-content:space-between; }
+  .hist-card h3 span{ font-weight:400; color:var(--text-dim); }
+  .hist-grid{ stroke:var(--border); stroke-width:1; }
+  .hist-axis{ font-size:9.5px; fill:var(--text-dim); }
+  .hist-axis.day{ font-size:10px; text-anchor:middle; }
+  .hist-value{ font-size:10px; font-weight:600; fill:var(--text); text-anchor:middle; }
+  .hist-bar{ fill:var(--accent); opacity:.62; }
+  .hist-bar.today{ opacity:1; }
+  .hist-hit{ fill:transparent; }
+  .hist-hit:hover{ fill:var(--accent-soft); }
+  .hist-grid-cells{ display:grid; grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(7,auto); grid-auto-flow:column; gap:3px; }
+  .hist-grid-cells i, .hist-legend i{ display:block; aspect-ratio:1; border-radius:3px; background:var(--ring-track); }
+  .hist-grid-cells i.fut{ visibility:hidden; }
+  .hist-grid-cells i.today{ outline:2px solid var(--text-dim); outline-offset:1px; }
+  .hist-grid-cells .l1, .hist-legend .l1{ background:var(--accent-soft); background:color-mix(in srgb, var(--accent) 28%, var(--surface)); }
+  .hist-grid-cells .l2, .hist-legend .l2{ background:var(--accent-soft); background:color-mix(in srgb, var(--accent) 50%, var(--surface)); }
+  .hist-grid-cells .l3, .hist-legend .l3{ background:var(--accent); background:color-mix(in srgb, var(--accent) 75%, var(--surface)); }
+  .hist-grid-cells .l4, .hist-legend .l4{ background:var(--accent); }
+  .hist-legend{ display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:8px; font-size:.68rem; color:var(--text-dim); }
+  .hist-legend i{ width:11px; height:11px; aspect-ratio:auto; }
+  .hist-recent{ list-style:none; margin:0; padding:0; }
+  .hist-recent li{ display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-top:1px solid var(--border); font-size:.85rem; }
+  .hist-recent li:first-child{ border-top:0; }
+  .hist-recent .dim{ color:var(--text-dim); text-align:right; }
+  .hist-empty{ color:var(--text-dim); font-size:.88rem; line-height:1.5; margin:4px 2px 0; }
+  .hist-clear{ display:block; margin:6px auto 0; background:none; border:0; color:var(--text-dim); font:inherit; font-size:.8rem; text-decoration:underline; cursor:pointer; padding:10px; min-height:44px; }
+  .hist-clear[hidden]{ display:none; }
+
+  /* ---------- "Your data" section of the gear menu ---------- */
+  .data-sec{ border-top:1px solid var(--border); margin-top:6px; padding-top:10px; }
+  .data-sec .data-title{ font-size:.95rem; font-weight:600; margin:0 0 8px; }
+  .data-row{ display:flex; gap:8px; }
+  .data-row button{ flex:1; min-height:44px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font:inherit; font-size:.88rem; font-weight:500; cursor:pointer; }
+  .data-row button:hover, .data-row button:focus-visible{ background:var(--accent-soft); }
+  .data-sec label.data-check{ display:flex; gap:8px; align-items:center; font-size:.8rem; color:var(--text); margin:10px 0 6px; }
+  .data-note{ font-size:.72rem; color:var(--text-dim); margin:0; line-height:1.4; }
+  .data-status{ font-size:.78rem; color:var(--text); margin:8px 0 0; line-height:1.4; }
+  .data-status.err{ color:var(--text); font-weight:600; }
+  .data-status:empty{ display:none; }

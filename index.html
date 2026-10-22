@@ -53,13 +53,15 @@
   <button class="tab-btn" id="tabBtnBreathe" data-tab="breathe" aria-pressed="false">Breathe</button>
   <button class="tab-btn" id="tabBtnReflect" data-tab="reflect" aria-pressed="false">Reflect</button>
   <div class="more-wrap">
-    <button class="tab-btn more-btn" id="moreBtn" type="button" title="More Timers" aria-haspopup="true" aria-expanded="false" aria-controls="morePop">More <span aria-hidden="true">&#9662;</span></button>
-    <div class="more-pop" id="morePop" role="menu" aria-label="More timers" hidden>
+    <button class="tab-btn more-btn" id="moreBtn" type="button" title="More" aria-haspopup="true" aria-expanded="false" aria-controls="morePop">More <span aria-hidden="true">&#9662;</span></button>
+    <div class="more-pop" id="morePop" role="menu" aria-label="More" hidden>
       <p class="more-lead">Looking for another timer?</p>
       <button type="button" class="more-item" role="menuitem" data-open="pomodoro"><strong>Pomodoro</strong><span>Focus sprints with short breaks</span></button>
       <button type="button" class="more-item" role="menuitem" data-open="countup"><strong>Count Up</strong><span>Open-ended, counts time as you sit</span></button>
       <button type="button" class="more-item" role="menuitem" data-open="stopwatch"><strong>Stopwatch</strong><span>Hundredths and lap times</span></button>
       <p class="more-soon">More timers coming soon.</p>
+      <p class="more-group">Your progress</p>
+      <button type="button" class="more-item" role="menuitem" data-open="history"><strong>History</strong><span>Streaks and your last few weeks</span></button>
     </div>
   </div>
 </nav>
@@ -269,6 +271,14 @@
   <ol class="lap-list" id="swLaps" aria-label="Laps" hidden></ol>
 </section>
 
+<section class="tab-panel" id="panel-history" aria-labelledby="histTitle">
+  <div class="hist">
+    <h2 class="hist-title" id="histTitle">History <small>stored on this device</small></h2>
+    <div id="histBody"></div>
+    <button type="button" class="hist-clear" id="histClear" hidden>Clear history&hellip;</button>
+  </div>
+</section>
+
 <section class="tab-panel" id="panel-reflect">
   <div class="reflect-card"><p id="reflectText">Tap below for a reflection prompt.</p></div>
   <button class="reflect-btn" id="reflectBtn">New prompt</button>
@@ -385,6 +395,7 @@
 </aside>
 
 <script type="module" src="assets/js/app/main.js"></script>
+<script type="module" src="assets/js/app/data-menu.js"></script>
 <script src="assets/js/menu.js"></script>
 <script src="assets/js/consent.js"></script>
 <script src="assets/js/preview.js"></script>
