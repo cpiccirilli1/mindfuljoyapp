@@ -654,3 +654,9 @@ html.pride .tomato-bg{ --accent:#e5484d; }
   .data-status{ font-size:.78rem; color:var(--text); margin:8px 0 0; line-height:1.4; }
   .data-status.err{ color:var(--text); font-weight:600; }
   .data-status:empty{ display:none; }
+
+  /* ---------- Photo under an article title ---------- */
+  .hero-photo{ margin:0 0 22px; }
+  .hero-photo img{ display:block; width:100%; height:auto; aspect-ratio:3/2; object-fit:cover; object-position:30% 50%; border-radius:14px; border:1px solid var(--border); background:var(--surface); transform:none; }
+  .hero-photo figcaption{ margin-top:6px; font-size:.72rem; color:var(--text-dim); text-align:right; }
+  .hero-photo figcaption a{ color:var(--text-dim); }

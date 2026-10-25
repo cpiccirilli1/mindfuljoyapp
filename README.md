@@ -59,6 +59,7 @@ assets/
   js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
                       (checks the address, not the branch, so merging to main never marks production;
                       edit LIVE_HOSTS if the live address changes)
+  img/                Article photos, resized (WebP with a JPEG fallback); credits are on the About page
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon (the lotus flower)
@@ -132,6 +133,8 @@ Third-party assets keep their own licenses:
 
 - **Bell recordings** (`assets/audio/*.mp3`): Creative Commons CC0 1.0 (public domain). Credits and sources are in `assets/audio/CREDITS.txt`.
 - **Inter typeface** (`assets/fonts/`): SIL Open Font License 1.1, served from this site (the license is in `assets/fonts/OFL.txt`).
+- **Guide photo** (`assets/img/singing-bowl.*`): "Person holding singing bowl with incense" by THLT LCX on Unsplash, used
+  under the Unsplash License (https://unsplash.com/license), resized for the web. Credit is on the guide and the About page.
 - **Icons and logo** (lotus flower, tomato): original artwork made for this project, covered by the MIT License.
 
 ## Notes
@@ -141,7 +144,7 @@ Third-party assets keep their own licenses:
   length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
   backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v8`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v9`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
   Everything else comes from this site's own files.
