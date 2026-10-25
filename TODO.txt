@@ -37,6 +37,36 @@ FEATURES
 [x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [x] Share preview image for links (og:image)
     - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
+[ ] Update-available message: when a new version is ready, show a small
+    "New version available - reload" banner (the offline copy can keep people
+    on an old version)
+[ ] "Test sound" button, so people can check their volume and the phone's
+    silent switch before a session (also confirms the breathing tones)
+[ ] Respect the device's "reduce motion" setting for the breathing circle
+    (gentler or no growing animation)
+[ ] End-of-session screen: a short thank-you with a gentle Ko-fi note and a
+    one-tap "log it" for the streak
+
+SEO, TRUST AND POLISH (Oct 25)
+-----------------------------
+[x] Home page text under the timer: "How Mindful Joy works" and 7 FAQs
+[x] Structured data (WebApplication, JSON-LD) on the home page
+[x] Unique titles and descriptions on every page; sitemap dates
+[x] Self-host the Inter font (assets/fonts); removed Google Fonts; Privacy,
+    About and README updated (AdSense is now the only outside request)
+[~] Visitor counts (Cloudflare Web Analytics, no cookies): code is ready in
+    assets/js/analytics.js and does nothing until a token is pasted in.
+    To finish: enable Web Analytics for mindfuljoy.app in the Cloudflare
+    dashboard, paste the token into TOKEN, then add this to Privacy
+    (section 1 and 4) and drop "we do not run our own analytics":
+      "Visitor counts: Mindful Joy uses Cloudflare Web Analytics to count
+      visits and see which pages are used. It sets no cookies, does not
+      follow you across sites, and is skipped if your browser sends Do Not
+      Track or Global Privacy Control."
+[ ] Check text contrast in every theme (dim text, Pride themes) and fix any
+    that fall short
+[ ] Friendly 404 page that points back to the timer
+[ ] GitHub page polish: README screenshot, a short CONTRIBUTING note, topic tags
 
 CONTENT
 -------

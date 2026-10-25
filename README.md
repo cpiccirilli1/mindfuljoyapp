@@ -52,6 +52,7 @@ assets/
                         run it); data-menu.js adds Export / Import to the gear menu on every page
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
+  js/analytics.js     Optional Cloudflare Web Analytics (cookieless). Does nothing until a token is pasted in; see the file
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   js/pwa.js           Registers the service worker (every page)
   js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
@@ -127,7 +128,7 @@ The code in this repository (HTML, CSS and JavaScript) is released under the MIT
 Third-party assets keep their own licenses:
 
 - **Bell recordings** (`assets/audio/*.mp3`): Creative Commons CC0 1.0 (public domain). Credits and sources are in `assets/audio/CREDITS.txt`.
-- **Inter typeface**: SIL Open Font License 1.1, loaded from Google Fonts.
+- **Inter typeface** (`assets/fonts/`): SIL Open Font License 1.1, served from this site (the license is in `assets/fonts/OFL.txt`).
 - **Icons and logo** (lotus flower, tomato): original artwork made for this project, covered by the MIT License.
 
 ## Notes
@@ -137,9 +138,9 @@ Third-party assets keep their own licenses:
   length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
   backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v6`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v7`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
-- Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
-  request, self-host the font and delete the Google Fonts `<link>` tags.
+- Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
+  Everything else comes from this site's own files.
 - The Ko-fi link and contact email are set in the Donations button (every page header) and in about.html,
   privacy.html and terms.html.
