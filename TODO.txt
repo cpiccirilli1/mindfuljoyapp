@@ -70,6 +70,7 @@ SEO, TRUST AND POLISH (Oct 25)
 
 CONTENT
 -------
+[x] Guide: How to use Mindful Joy (getting-started.html; linked from the updates strip)
 [ ] Guide: What is mindfulness?
 [ ] Guide: How to start meditating
 [ ] Guide: Box, 4-7-8, and coherent breathing explained
@@ -78,7 +79,7 @@ CONTENT
 
 SITE / OPS
 ----------
-[ ] When articles are published: add them to About features and to the
+[x] When articles are published: add them to About features and to the
     Terms (written content is general information, not medical advice)
 [x] Merge dev into main after the dev preview is approved (done Oct 18)
 [ ] After AdSense approval: replace the current cookie banner (Accept /
@@ -90,7 +91,7 @@ SITE / OPS
 [x] Update README (old name and file list; add Articles page, menu,
     consent banner, wrangler.jsonc)
 [ ] After AdSense approval: place ad units on content pages only
-[ ] When articles are published: remove noindex from articles.html and
+[x] When articles are published: remove noindex from articles.html and
     add it to sitemap.xml
 
 LAYOUT FIXES

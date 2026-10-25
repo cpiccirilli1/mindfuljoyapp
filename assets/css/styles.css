@@ -281,7 +281,7 @@
   .info-view h2{ font-size:1.05rem; font-weight:600; margin:28px 0 8px; }
   .info-view p, .info-view li{ font-size:.92rem; line-height:1.65; color:var(--text); }
   .info-view p{ margin:0 0 12px; }
-  .info-view ul{ margin:0 0 12px; padding-left:20px; }
+  .info-view ul, .info-view ol{ margin:0 0 12px; padding-left:22px; }
   .info-view li{ margin-bottom:6px; }
   .info-view a{ color:var(--accent); }
   .info-view .lead{ font-size:1.02rem; color:var(--text); }
@@ -658,13 +658,5 @@ html.pride .tomato-bg{ --accent:#e5484d; }
   /* ---------- Home page text (under the timer) ---------- */
   .home-info{ width:100%; margin-top:34px; padding-top:22px; border-top:1px solid var(--border); color:var(--text-dim); font-size:.88rem; line-height:1.55; }
   .home-info h2{ font-family:'Inter',system-ui,sans-serif; font-weight:500; font-size:1.05rem; color:var(--text); margin:0 0 8px; }
-  .home-info p{ margin:0 0 14px; }
-  .home-info a{ color:var(--accent); }
-  .faq details{ border-top:1px solid var(--border); }
-  .faq details:last-child{ border-bottom:1px solid var(--border); }
-  .faq summary{ cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 2px; min-height:44px; color:var(--text); font-weight:500; }
-  .faq summary::-webkit-details-marker{ display:none; }
-  .faq summary::after{ content:''; flex:none; width:7px; height:7px; border-right:2px solid var(--text-dim); border-bottom:2px solid var(--text-dim); transform:rotate(45deg); transition:transform .15s; margin-right:4px; }
-  .faq details[open] summary::after{ transform:rotate(-135deg); }
-  .faq summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; border-radius:6px; }
-  .faq details p{ margin:0 2px 14px; }
+  .home-info p{ margin:0 0 12px; }
+  .home-info a{ color:var(--accent); font-weight:500; }

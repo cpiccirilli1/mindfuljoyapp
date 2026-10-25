@@ -26,7 +26,8 @@ JavaScript, with no server code, database or build step. Open source under the M
 
 ```
 index.html            Timer, Breathe, Reflect, Pomodoro, Count Up and Stopwatch tools
-articles.html         Articles page (placeholder for now, set to noindex)
+articles.html         Articles page (lists the guides)
+getting-started.html  The first article: "How to Use Mindful Joy" (copy it to start a new article)
 about.html            About page (features, credits and licenses)
 privacy.html          Privacy Policy
 terms.html            Terms of Service
@@ -104,8 +105,10 @@ It is a notice only: the AdSense script still loads on every page. After AdSense
 with AdSense's own consent message (AdSense, Privacy & messaging), which is the tool meant for visitors in the
 EEA, UK and Switzerland, and update Privacy Policy section 5 to match.
 
-**Articles.** `articles.html` is a placeholder with `noindex`. When real articles are published, remove the
-`noindex` tag and add the pages to `sitemap.xml`.
+**Articles.** `articles.html` lists the guides and is indexed. To add an article, copy `getting-started.html`,
+change the title, description, `canonical`, `og:url` and Article JSON-LD, list it on `articles.html`, add it to
+`sitemap.xml` and to the `PRECACHE` list in `sw.js` (and bump `CACHE_VERSION`). The updates strip text is the
+`UPDATE` object at the top of the strip code in `assets/js/menu.js`.
 
 ## Header menu and updates strip
 
@@ -138,7 +141,7 @@ Third-party assets keep their own licenses:
   length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
   backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v7`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v8`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
   Everything else comes from this site's own files.
