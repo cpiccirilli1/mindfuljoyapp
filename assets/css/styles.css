@@ -654,9 +654,3 @@ html.pride .tomato-bg{ --accent:#e5484d; }
   .data-status{ font-size:.78rem; color:var(--text); margin:8px 0 0; line-height:1.4; }
   .data-status.err{ color:var(--text); font-weight:600; }
   .data-status:empty{ display:none; }
-
-  /* ---------- Home page text (under the timer) ---------- */
-  .home-info{ width:100%; margin-top:34px; padding-top:22px; border-top:1px solid var(--border); color:var(--text-dim); font-size:.88rem; line-height:1.55; }
-  .home-info h2{ font-family:'Inter',system-ui,sans-serif; font-weight:500; font-size:1.05rem; color:var(--text); margin:0 0 8px; }
-  .home-info p{ margin:0 0 12px; }
-  .home-info a{ color:var(--accent); font-weight:500; }

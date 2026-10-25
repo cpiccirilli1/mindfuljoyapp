@@ -49,7 +49,9 @@ FEATURES
 
 SEO, TRUST AND POLISH (Oct 25)
 -----------------------------
-[x] Home page text under the timer: "How Mindful Joy works" and 7 FAQs
+[x] Home page FAQ written, then moved into the guide article (getting-started.html);
+    the home page itself now has no text under the timer (revisit if AdSense
+    asks for more content on the home page)
 [x] Structured data (WebApplication, JSON-LD) on the home page
 [x] Unique titles and descriptions on every page; sitemap dates
 [x] Self-host the Inter font (assets/fonts); removed Google Fonts; Privacy,
