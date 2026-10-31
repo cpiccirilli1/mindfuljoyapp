@@ -4,6 +4,7 @@ import { settings } from './state.js';
 import { playBreathCue, ensureAudio } from './audio.js';
 import { acquireWake } from './wake.js';
 import { registerActivity, maybeRelease } from './activity.js';
+import { recordSession } from './history.js';
 
 const PATTERNS = {
   box:      [['Inhale',4],['Hold',4],['Exhale',4],['Hold',4]],
@@ -16,7 +17,7 @@ const breathCycleCount = $('breathCycleCount');
 const breathPlayBtn = $('breathPlayBtn');
 const patternSelect = $('patternSelect');
 const cyclesSelect = $('cyclesSelect');
-let breathTimer = null, breathRunning = false, breathStepIdx = 0, breathCycle = 1;
+let breathTimer = null, breathRunning = false, breathStepIdx = 0, breathCycle = 1, breathStartedAt = 0;
 
 // The circle is drawn at full size and shrunk with a CSS scale. Resting (small) size is MIN_SCALE;
 // keep it in step with the starting transform in styles.css (.breath-circle).
@@ -46,13 +47,16 @@ function breathStep(){
 function startBreathing(){
   ensureAudio();
   acquireWake();
-  breathRunning = true; breathStepIdx = 0; breathCycle = 1;
+  breathRunning = true; breathStepIdx = 0; breathCycle = 1; breathStartedAt = Date.now();
   patternSelect.disabled = true; cyclesSelect.disabled = true;
   breathPlayBtn.innerHTML = '&#10074;&#10074;';
   breathStep();
 }
 export function stopBreathing(){
+  const wasRunning = breathRunning;
   breathRunning = false;   // first, so the screen can be released below
+  // Finishing all the cycles, or stopping part way, both count for the time spent (under a minute is ignored).
+  if(wasRunning) recordSession('breath', (Date.now() - breathStartedAt)/1000);
   maybeRelease();
   if(breathTimer){ clearTimeout(breathTimer); breathTimer = null; }
   patternSelect.disabled = false; cyclesSelect.disabled = false;

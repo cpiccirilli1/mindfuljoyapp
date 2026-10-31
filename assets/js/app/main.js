@@ -9,6 +9,7 @@ import './pomodoro.js';
 import './countup.js';
 import './stopwatch.js';
 import './reflect.js';
+import './history.js';     // session history and the History page
 import './theme-menu.js';
 import './sequence-editor.js'; // sit + walk editor
 import './shortcuts.js';

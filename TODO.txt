@@ -13,7 +13,13 @@ FEATURES
     - Show the current segment name and the time left in it
     - Save segment layouts on the device (localStorage)
     - Presets for common sit / walk patterns
-[ ] Session history and streaks, kept on the device
+[x] Session history and streaks, kept on the device
+    - History page under More: streaks, past 7 days, 12-week calendar, recent
+    - Records main timer, sit + walk and breathing sessions (a minute or more);
+      a day counts toward a streak at 5 minutes or more
+[x] Export / Import of history (and optionally settings) in the gear menu
+[ ] History ideas: weekly goal, per-kind totals, end-of-session screen with a
+    gentle Ko-fi note, optional streak line under the timer, copy/paste backup
 [ ] Ambient sound options (rain, ocean, etc.)
 [x] Focus / Pomodoro timer (under the "More" menu; room for more timers there)
     - Focus, short break, long break and rounds are adjustable
@@ -31,9 +37,42 @@ FEATURES
 [x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [x] Share preview image for links (og:image)
     - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
+[ ] Update-available message: when a new version is ready, show a small
+    "New version available - reload" banner (the offline copy can keep people
+    on an old version)
+[ ] "Test sound" button, so people can check their volume and the phone's
+    silent switch before a session (also confirms the breathing tones)
+[ ] Respect the device's "reduce motion" setting for the breathing circle
+    (gentler or no growing animation)
+[ ] End-of-session screen: a short thank-you with a gentle Ko-fi note and a
+    one-tap "log it" for the streak
+
+SEO, TRUST AND POLISH (Oct 25)
+-----------------------------
+[x] Home page FAQ written, then moved into the guide article (getting-started.html);
+    the home page itself now has no text under the timer (revisit if AdSense
+    asks for more content on the home page)
+[x] Structured data (WebApplication, JSON-LD) on the home page
+[x] Unique titles and descriptions on every page; sitemap dates
+[x] Self-host the Inter font (assets/fonts); removed Google Fonts; Privacy,
+    About and README updated (AdSense is now the only outside request)
+[~] Visitor counts (Cloudflare Web Analytics, no cookies): code is ready in
+    assets/js/analytics.js and does nothing until a token is pasted in.
+    To finish: enable Web Analytics for mindfuljoy.app in the Cloudflare
+    dashboard, paste the token into TOKEN, then add this to Privacy
+    (section 1 and 4) and drop "we do not run our own analytics":
+      "Visitor counts: Mindful Joy uses Cloudflare Web Analytics to count
+      visits and see which pages are used. It sets no cookies, does not
+      follow you across sites, and is skipped if your browser sends Do Not
+      Track or Global Privacy Control."
+[ ] Check text contrast in every theme (dim text, Pride themes) and fix any
+    that fall short
+[ ] Friendly 404 page that points back to the timer
+[ ] GitHub page polish: README screenshot, a short CONTRIBUTING note, topic tags
 
 CONTENT
 -------
+[x] Guide: How to use Mindful Joy (getting-started.html; linked from the updates strip)
 [ ] Guide: What is mindfulness?
 [ ] Guide: How to start meditating
 [ ] Guide: Box, 4-7-8, and coherent breathing explained
@@ -42,7 +81,7 @@ CONTENT
 
 SITE / OPS
 ----------
-[ ] When articles are published: add them to About features and to the
+[x] When articles are published: add them to About features and to the
     Terms (written content is general information, not medical advice)
 [x] Merge dev into main after the dev preview is approved (done Oct 18)
 [ ] After AdSense approval: replace the current cookie banner (Accept /
@@ -54,7 +93,7 @@ SITE / OPS
 [x] Update README (old name and file list; add Articles page, menu,
     consent banner, wrangler.jsonc)
 [ ] After AdSense approval: place ad units on content pages only
-[ ] When articles are published: remove noindex from articles.html and
+[x] When articles are published: remove noindex from articles.html and
     add it to sitemap.xml
 
 LAYOUT FIXES
@@ -63,6 +102,7 @@ LAYOUT FIXES
 
 LEARNING JAVASCRIPT
 -------------------
-[ ] Move timer logic into small functions and add a few tests
+[~] Move timer logic into small functions and add a few tests
+    - Started: tests/history.test.mjs (node --test tests/history.test.mjs); timer logic still to do
 [x] Split app.js into separate files by feature (assets/js/app/)
 [x] Switch the split files to ES modules (import / export) so files stop sharing one scope

@@ -76,9 +76,9 @@
   // The strip shows on every page load. The close button hides it only until the
   // next page load or refresh; nothing is saved on the device.
   var UPDATE = {
-    text: 'New: Articles coming soon.',
-    href: 'articles.html',
-    linkText: 'Details'
+    text: 'New: A quick guide to using Mindful Joy.',
+    href: 'getting-started.html',
+    linkText: 'Read it'
   };
   var note = document.createElement('div');
   note.className = 'update-strip';
@@ -101,7 +101,8 @@
   });
   note.appendChild(msg);
   note.appendChild(x);
-  mark.closest('.topbar').after(note);
+  // No need to point at the page you are already reading.
+  if (here !== UPDATE.href.toLowerCase()) mark.closest('.topbar').after(note);
 
   function setOpen(open, returnFocus) {
     pop.hidden = !open;

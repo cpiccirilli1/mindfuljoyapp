@@ -10,6 +10,7 @@ JavaScript, with no server code, database or build step. Open source under the M
 - **Bells:** five real CC0 bell recordings, start and end bells (1 to 5 strikes), a fixed higher-toned interval
   bell (repeating or custom times), volume, a preparation delay, and an optional vibration at the start and end
   (off by default; needs a browser that supports the Vibration API, which most iPhones lack).
+- **History:** streaks, a past-7-days bar chart, a 12-week calendar and recent sessions, kept on the device, under the More menu. Export and Import (gear menu) move it to another device.
 - **Breathe:** box, 4-7-8 and coherent breathing pacer. The circle grows smoothly for the whole inhale and shrinks for the whole exhale. Soft tones (made in the browser, so no sound files or licenses; switch them off with the Sound menu) mark inhale, hold, exhale and the end. **Reflect:** reflection prompts.
 - **More ▾:** a menu of extra timers. **Pomodoro** (focus, short and long breaks, rounds, auto-start, a faint
   theme-tinted tomato behind the ring), **Count Up** (open-ended, optional interval chime) and **Stopwatch**
@@ -25,7 +26,8 @@ JavaScript, with no server code, database or build step. Open source under the M
 
 ```
 index.html            Timer, Breathe, Reflect, Pomodoro, Count Up and Stopwatch tools
-articles.html         Articles page (placeholder for now, set to noindex)
+articles.html         Articles page (lists the guides)
+getting-started.html  The first article: "How to Use Mindful Joy" (copy it to start a new article)
 about.html            About page (features, credits and licenses)
 privacy.html          Privacy Policy
 terms.html            Terms of Service
@@ -37,6 +39,7 @@ sw.js                 Service worker: saves the site for offline use (network fi
 wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
 .assetsignore         Repo files that Cloudflare should NOT publish on the site
 LICENSE               MIT License
+tests/                Unit tests for the history maths. Run: node --test tests/history.test.mjs
 TODO.txt              Planned work (not published on the site)
 assets/
   css/styles.css      All styling
@@ -44,15 +47,19 @@ assets/
   js/app/             The timer page (index.html only), written as ES modules: index.html loads
                         main.js, and each file imports what it needs. One file per feature:
                         timer, sequence, sequence-editor, intervals, audio, bell-settings, tabs,
-                        pomodoro, countup, stopwatch, breathing, reflect, theme-menu, shortcuts,
-                        storage, plus small shared ones (dom, state, display, wake, activity)
+                        pomodoro, countup, stopwatch, breathing, reflect, history, theme-menu, shortcuts,
+                        storage, plus small shared ones (dom, state, display, wake, activity).
+                        history-store.js is the history data and maths (no page code, so the tests can
+                        run it); data-menu.js adds Export / Import to the gear menu on every page
   js/menu.js          Header menu button and the updates strip (every page)
   js/consent.js       Cookie notice banner (every page)
+  js/analytics.js     Optional Cloudflare Web Analytics (cookieless). Does nothing until a token is pasted in; see the file
   js/site.js          Theme menu and Back to top button for the About, Privacy, Terms and Articles pages
   js/pwa.js           Registers the service worker (every page)
   js/preview.js       Shows a "Preview build" tag and [Preview] tab title on any address other than mindfuljoy.app
                       (checks the address, not the branch, so merging to main never marks production;
                       edit LIVE_HOSTS if the live address changes)
+  img/                Article photos, resized (WebP with a JPEG fallback); credits are on the About page
   audio/*.mp3         Five CC0 bell recordings
   audio/CREDITS.txt   Recording credits and license details
   favicon.svg         Site icon (the lotus flower)
@@ -99,8 +106,10 @@ It is a notice only: the AdSense script still loads on every page. After AdSense
 with AdSense's own consent message (AdSense, Privacy & messaging), which is the tool meant for visitors in the
 EEA, UK and Switzerland, and update Privacy Policy section 5 to match.
 
-**Articles.** `articles.html` is a placeholder with `noindex`. When real articles are published, remove the
-`noindex` tag and add the pages to `sitemap.xml`.
+**Articles.** `articles.html` lists the guides and is indexed. To add an article, copy `getting-started.html`,
+change the title, description, `canonical`, `og:url` and Article JSON-LD, list it on `articles.html`, add it to
+`sitemap.xml` and to the `PRECACHE` list in `sw.js` (and bump `CACHE_VERSION`). The updates strip text is the
+`UPDATE` object at the top of the strip code in `assets/js/menu.js`.
 
 ## Header menu and updates strip
 
@@ -123,17 +132,21 @@ The code in this repository (HTML, CSS and JavaScript) is released under the MIT
 Third-party assets keep their own licenses:
 
 - **Bell recordings** (`assets/audio/*.mp3`): Creative Commons CC0 1.0 (public domain). Credits and sources are in `assets/audio/CREDITS.txt`.
-- **Inter typeface**: SIL Open Font License 1.1, loaded from Google Fonts.
+- **Inter typeface** (`assets/fonts/`): SIL Open Font License 1.1, served from this site (the license is in `assets/fonts/OFL.txt`).
+- **Guide photo** (`assets/img/singing-bowl.*`): "Person holding singing bowl with incense" by THLT LCX on Unsplash, used
+  under the Unsplash License (https://unsplash.com/license), resized for the web. Credit is on the guide and the About page.
 - **Icons and logo** (lotus flower, tomato): original artwork made for this project, covered by the MIT License.
 
 ## Notes
 
 - Visitors' settings are saved in their own browser (localStorage): `still.settings.v1` (preferences and the
-  current sit/walk segments), `still.layouts.v1` (saved layouts) and `mj.consent.v1` (cookie notice choice).
+  current sit/walk segments), `still.layouts.v1` (saved layouts), `mj.history.v1` (finished sessions: id, end time,
+  length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
+  backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v5`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v10`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
-- Outside requests the pages make: the Inter font from Google Fonts, and Google AdSense. To remove the font
-  request, self-host the font and delete the Google Fonts `<link>` tags.
+- Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
+  Everything else comes from this site's own files.
 - The Ko-fi link and contact email are set in the Donations button (every page header) and in about.html,
   privacy.html and terms.html.
