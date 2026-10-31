@@ -1,7 +1,7 @@
 // Mindful Joy service worker: lets the site work offline once it has been visited.
 // Strategy: network first (so a new deploy shows up right away), falling back to the saved copy when offline.
 // Bump CACHE_VERSION to clear old saved copies.
-const CACHE_VERSION = 'mj-v9';
+const CACHE_VERSION = 'mj-v10';
 const PRECACHE = [
   './', 'index.html', 'about.html', 'privacy.html', 'terms.html', 'articles.html', 'getting-started.html', 'manifest.webmanifest',
   'assets/css/styles.css',

@@ -306,6 +306,9 @@
   input[type=range]{ width:100%; min-height:32px; accent-color:var(--accent); cursor:pointer; }
   .shortcut-hint{ font-size:.74rem; color:var(--text-dim); margin:22px 0 0; text-align:center; }
   @media (hover:none){ .shortcut-hint{ display:none; } }
+  .help-hint{ font-size:.82rem; color:var(--text-dim); margin:10px 0 0; text-align:center; }
+  .help-hint a{ color:var(--accent); text-underline-offset:2px; }
+  .help-hint a:hover{ color:var(--text); }
 
   /* ---------- Theme gear menu ---------- */
   .top-actions{ display:flex; align-items:center; gap:10px; }
