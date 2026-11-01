@@ -280,6 +280,17 @@
   .info-view .updated{ font-size:.78rem; color:var(--text-dim); margin:0 0 22px; }
   .info-view h2{ font-size:1.05rem; font-weight:600; margin:28px 0 8px; }
   .info-view p, .info-view li{ font-size:.92rem; line-height:1.65; color:var(--text); }
+  /* Affiliate content: a disclosure note at the top of a page, and recommendation cards.
+     Links to products always carry rel="sponsored nofollow noopener". */
+  .info-view .aff-note{ font-size:.82rem; line-height:1.55; color:var(--text-dim); background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:10px 14px; margin:0 0 20px; }
+  .info-view .aff-note a{ color:var(--accent); }
+  .info-view .pick{ border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin:16px 0; background:var(--surface); }
+  .info-view .pick .tag{ display:inline-block; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin:0 0 4px; }
+  .info-view .pick h3{ font-size:1rem; font-weight:600; margin:0 0 6px; }
+  .info-view .pick p{ margin:0 0 8px; }
+  .info-view .pick .pc{ font-size:.85rem; color:var(--text-dim); margin:0 0 10px; }
+  .info-view .pick .buy{ display:inline-block; font-size:.85rem; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:7px 16px; text-decoration:none; }
+  .info-view .pick .buy:hover{ background:var(--accent-soft); }
   .info-view p{ margin:0 0 12px; }
   .info-view ul, .info-view ol{ margin:0 0 12px; padding-left:22px; }
   .info-view li{ margin-bottom:6px; }
