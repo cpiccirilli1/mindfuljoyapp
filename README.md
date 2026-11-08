@@ -144,7 +144,7 @@ Third-party assets keep their own licenses:
   length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
   backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v11`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache `mj-v12`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
   Everything else comes from this site's own files.
