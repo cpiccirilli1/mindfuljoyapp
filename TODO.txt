@@ -106,3 +106,9 @@ LEARNING JAVASCRIPT
     - Started: tests/history.test.mjs (node --test tests/history.test.mjs); timer logic still to do
 [x] Split app.js into separate files by feature (assets/js/app/)
 [x] Switch the split files to ES modules (import / export) so files stop sharing one scope
+
+AFFILIATE ARTICLES (site support is built: disclosure note + recommendation cards, Terms/Privacy updated Nov 1 2026)
+- Join a program (Amazon Associates, Bookshop.org, or a network like Impact/ShareASale/CJ), then write the first article.
+- Top of any page with affiliate links: <p class="aff-note">This page contains affiliate links. If you buy through them, I earn a small commission at no extra cost to you. It never changes what I recommend. <a href="terms.html#affiliate">Details</a></p>
+- Each product: <div class="pick"><p class="tag">Best overall</p><h3>Name</h3><p>Why</p><p class="pc">Pros: ... &middot; Cons: ...</p><a class="buy" href="AFFILIATE-URL" rel="sponsored nofollow noopener" target="_blank">View on retailer &rarr;</a></div>
+- Add the article to articles.html, sitemap.xml and the sw.js PRECACHE list (bump CACHE_VERSION).
