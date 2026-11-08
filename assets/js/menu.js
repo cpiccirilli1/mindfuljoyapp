@@ -76,8 +76,8 @@
   // The strip shows on every page load. The close button hides it only until the
   // next page load or refresh; nothing is saved on the device.
   var UPDATE = {
-    text: 'New: A quick guide to using Mindful Joy.',
-    href: 'getting-started.html',
+    text: 'New article: What is mindfulness?',
+    href: 'what-is-mindfulness.html',
     linkText: 'Read it'
   };
   var note = document.createElement('div');

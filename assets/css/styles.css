@@ -279,6 +279,7 @@
   .info-view h1{ font-size:1.6rem; font-weight:500; margin:0 0 6px; letter-spacing:.005em; }
   .info-view .updated{ font-size:.78rem; color:var(--text-dim); margin:0 0 22px; }
   .info-view h2{ font-size:1.05rem; font-weight:600; margin:28px 0 8px; }
+  .info-view article h3{ font-size:.96rem; font-weight:600; margin:20px 0 6px; }
   .info-view p, .info-view li{ font-size:.92rem; line-height:1.65; color:var(--text); }
   /* Affiliate content: a disclosure note at the top of a page, and recommendation cards.
      Links to products always carry rel="sponsored nofollow noopener". */
