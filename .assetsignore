@@ -3,3 +3,4 @@ wrangler.jsonc
 .assetsignore
 TODO.txt
 tests
+tools

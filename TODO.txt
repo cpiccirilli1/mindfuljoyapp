@@ -33,7 +33,7 @@ FEATURES
     while running, optional longer cycle count
 [ ] Stretch or pose sequencer
 [x] Offline use and "install to home screen" support (PWA)
-    - manifest.webmanifest, sw.js (network first), lotus app icons
+    - manifest.webmanifest, sw.js (now cache first, see Nov 24), lotus app icons
 [x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
 [x] Share preview image for links (og:image)
     - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
@@ -111,4 +111,4 @@ AFFILIATE ARTICLES (site support is built: disclosure note + recommendation card
 - Join a program (Amazon Associates, Bookshop.org, or a network like Impact/ShareASale/CJ), then write the first article.
 - Top of any page with affiliate links: <p class="aff-note">This page contains affiliate links. If you buy through them, I earn a small commission at no extra cost to you. It never changes what I recommend. <a href="terms.html#affiliate">Details</a></p>
 - Each product: <div class="pick"><p class="tag">Best overall</p><h3>Name</h3><p>Why</p><p class="pc">Pros: ... &middot; Cons: ...</p><a class="buy" href="AFFILIATE-URL" rel="sponsored nofollow noopener" target="_blank">View on retailer &rarr;</a></div>
-- Add the article to articles.html, sitemap.xml and the sw.js PRECACHE list (bump CACHE_VERSION).
+- Add the article to articles.html, sitemap.xml and the sw.js PRECACHE list (then run node tools/stamp-sw.mjs).

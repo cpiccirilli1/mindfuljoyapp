@@ -318,6 +318,12 @@
   input[type=range]{ width:100%; min-height:32px; accent-color:var(--accent); cursor:pointer; }
   .shortcut-hint{ font-size:.74rem; color:var(--text-dim); margin:22px 0 0; text-align:center; }
   @media (hover:none){ .shortcut-hint{ display:none; } }
+  /* "New version available" bar (pwa.js) */
+  .update-toast{ position:fixed; left:50%; bottom:max(16px, env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:10px; max-width:calc(100vw - 32px); padding:10px 12px 10px 16px; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:999px; box-shadow:0 6px 24px rgba(0,0,0,.18); font-size:.88rem; }
+  .update-toast span{ white-space:nowrap; }
+  .update-toast button{ font:inherit; cursor:pointer; border-radius:999px; padding:6px 14px; border:1px solid var(--accent); }
+  .update-toast .ut-reload{ background:var(--accent); color:var(--bg); }
+  .update-toast .ut-later{ background:transparent; color:var(--text-dim); border-color:transparent; }
   .help-hint{ font-size:.82rem; color:var(--text-dim); margin:10px 0 0; text-align:center; }
   .help-hint a{ color:var(--accent); text-underline-offset:2px; }
   .help-hint a:hover{ color:var(--text); }
