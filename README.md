@@ -35,7 +35,7 @@ ads.txt               Google AdSense publisher line (keep the filename lowercase
 robots.txt            Search engine rules (points to the sitemap)
 sitemap.xml           The public pages, using https://mindfuljoy.app
 manifest.webmanifest  Web app manifest (name, colors, icons) so the site can be installed
-sw.js                 Service worker: saves the site for offline use and fast starts (cache first, with a "New version available" bar)
+sw.js                 Service worker: saves the site for offline use and fast starts (cache first; a new version installs itself in the background)
 wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
 .assetsignore         Repo files that Cloudflare should NOT publish on the site
 LICENSE               MIT License

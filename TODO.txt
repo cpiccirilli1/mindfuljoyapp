@@ -44,11 +44,11 @@ FEATURES
     browser's own option). Add a note for iPhone/iPad (Share > Add to Home Screen),
     and run a Lighthouse installable/icons check
 [x] Faster app start (Nov 24): cache-first service worker, versioned cache stamped by
-    tools/stamp-sw.mjs, and a "New version available" bar (this also covers the old
-    update-available item below)
+    tools/stamp-sw.mjs; new versions install silently and take over on the next load
+    (no update bar)
 [x] Share preview image for links (og:image)
     - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
-[x] Update-available message: "New version available - Reload" bar (pwa.js)
+[x] Update-available message: not needed, new versions take over silently (sw.js skipWaiting)
 [ ] "Test sound" button, so people can check their volume and the phone's
     silent switch before a session (also confirms the breathing tones)
 [ ] Respect the device's "reduce motion" setting for the breathing circle

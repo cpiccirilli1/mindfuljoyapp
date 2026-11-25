@@ -2,13 +2,14 @@
 //
 // Strategy: cache first. Every page and file is saved in one versioned cache when the worker installs,
 // and launches are served from that cache straight away, with no waiting for the network.
-// When a new version of the site is deployed, the browser notices that this file changed, downloads the
-// whole new set into a NEW cache in the background, and waits. The page then shows "New version
-// available" (pwa.js); tapping Reload swaps everything over at once. Files never come from two versions.
+// When a new version of the site is deployed, the browser notices that this file changed and downloads the
+// whole new set into a NEW cache in the background. As soon as that is complete the new worker takes over
+// (skipWaiting), so the next load, reload or reopen shows the new version with no prompt. A page that is
+// already open is left alone. Files never come from two versions: a worker serves only its own cache.
 //
 // CACHE_VERSION is written by `node tools/stamp-sw.mjs` (a fingerprint of every file listed below).
 // Run it before each commit that changes the site; `node --test tests/` fails if it was forgotten.
-const CACHE_VERSION = 'mj-49b363c1';
+const CACHE_VERSION = 'mj-7d2dff0d';
 const PRECACHE = [
   './', 'index.html', 'about.html', 'privacy.html', 'terms.html', 'articles.html', 'getting-started.html', 'what-is-mindfulness.html', 'install-app.html', 'manifest.webmanifest',
   'assets/css/styles.css',
@@ -20,7 +21,11 @@ const PRECACHE = [
 
 self.addEventListener('install', e => {
   // cache:'reload' skips the browser's own HTTP cache so the saved copy is the fresh deploy.
-  e.waitUntil(caches.open(CACHE_VERSION).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' })))));
+  e.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())   // only after every file is saved, so a half-finished update never takes over
+  );
 });
 
 self.addEventListener('activate', e => {
@@ -28,11 +33,6 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_VERSION).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
-});
-
-// The page asks for the waiting version to take over (the Reload button).
-self.addEventListener('message', e => {
-  if(e.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Pages are saved under their .html names, but the host may serve them without the ending (/about).
