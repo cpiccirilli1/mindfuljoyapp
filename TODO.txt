@@ -18,7 +18,11 @@ FEATURES
     - Records main timer, sit + walk and breathing sessions (a minute or more);
       a day counts toward a streak at 5 minutes or more
 [x] Export / Import of history (and optionally settings) in the gear menu
-[ ] History ideas: weekly goal, per-kind totals, end-of-session screen with a
+[ ] History: "By timer" card (total time and sessions per timer). Decide: A) the 3 timers that
+    record today (meditation, sit + walk, breathing), or B) all 6 (Pomodoro focus time,
+    Count Up and Stopwatch would start recording; older sessions can't be recovered).
+    B was recommended; old backups still import either way
+[ ] History ideas: weekly goal, end-of-session screen with a
     gentle Ko-fi note, optional streak line under the timer, copy/paste backup
 [ ] Ambient sound options (rain, ocean, etc.)
 [x] Focus / Pomodoro timer (under the "More" menu; room for more timers there)
@@ -33,13 +37,18 @@ FEATURES
     while running, optional longer cycle count
 [ ] Stretch or pose sequencer
 [x] Offline use and "install to home screen" support (PWA)
-    - manifest.webmanifest, sw.js (network first), lotus app icons
+    - manifest.webmanifest, sw.js (now cache first, see Nov 24), lotus app icons
 [x] Check install on a real phone (Android Chrome, iPhone Safari) after it is live
+[x] Help link under the timer controls: "Lost on where to start? Click here for FAQs." (opens the guide)
+[ ] "Install app" item in the gear menu (the PWA is installable but only through the
+    browser's own option). Add a note for iPhone/iPad (Share > Add to Home Screen),
+    and run a Lighthouse installable/icons check
+[x] Faster app start (Nov 24): cache-first service worker, versioned cache stamped by
+    tools/stamp-sw.mjs, and a "New version available" bar (this also covers the old
+    update-available item below)
 [x] Share preview image for links (og:image)
     - assets/og-image.png (1200x630) plus og:image / twitter:card tags on every page
-[ ] Update-available message: when a new version is ready, show a small
-    "New version available - reload" banner (the offline copy can keep people
-    on an old version)
+[x] Update-available message: "New version available - Reload" bar (pwa.js)
 [ ] "Test sound" button, so people can check their volume and the phone's
     silent switch before a session (also confirms the breathing tones)
 [ ] Respect the device's "reduce motion" setting for the breathing circle
@@ -73,7 +82,7 @@ SEO, TRUST AND POLISH (Oct 25)
 CONTENT
 -------
 [x] Guide: How to use Mindful Joy (getting-started.html; linked from the updates strip)
-[ ] Guide: What is mindfulness?
+[x] Guide: What is mindfulness? (what-is-mindfulness.html, live Nov 8; stone photo by Gary Yost)
 [ ] Guide: How to start meditating
 [ ] Guide: Box, 4-7-8, and coherent breathing explained
 [ ] Guide: Walking meditation (pairs with the mixed-intervals feature)
@@ -100,6 +109,20 @@ LAYOUT FIXES
 ------------
 [x] Fix bell settings button and session link drop down centering.
 
+MONEY IDEAS (Nov 1-8 discussion, nothing built yet)
+--------------------------------------------------
+[ ] Ko-fi supporter tier: ad-free mode and extra themes, honor-system (the code is MIT, so locks are bypassable)
+[ ] Sellable content packs (guided audio, a course, printable journals) via Ko-fi or Gumroad
+[ ] Possible later: cloud sync of history (needs accounts + a backend; would change the
+    "everything stays on your device" promise)
+[ ] Affiliate programs to look at: Amazon Associates (must make a sale within 180 days),
+    Bookshop.org (books), networks Impact / ShareASale (Awin) / CJ, and direct programs from
+    cushion, singing bowl and incense makers (check each program's current terms)
+[ ] Mindfulness article: optional "Books to start with" box once a program is joined
+[ ] Later option: Android app for F-Droid (bundled wrapper such as Capacitor, built from source,
+    AdSense stripped out via a build flag; donation link in the listing). A TWA is a poor fit.
+    Google Play via PWABuilder is the easy store route ($25 once)
+
 LEARNING JAVASCRIPT
 -------------------
 [~] Move timer logic into small functions and add a few tests
@@ -111,4 +134,4 @@ AFFILIATE ARTICLES (site support is built: disclosure note + recommendation card
 - Join a program (Amazon Associates, Bookshop.org, or a network like Impact/ShareASale/CJ), then write the first article.
 - Top of any page with affiliate links: <p class="aff-note">This page contains affiliate links. If you buy through them, I earn a small commission at no extra cost to you. It never changes what I recommend. <a href="terms.html#affiliate">Details</a></p>
 - Each product: <div class="pick"><p class="tag">Best overall</p><h3>Name</h3><p>Why</p><p class="pc">Pros: ... &middot; Cons: ...</p><a class="buy" href="AFFILIATE-URL" rel="sponsored nofollow noopener" target="_blank">View on retailer &rarr;</a></div>
-- Add the article to articles.html, sitemap.xml and the sw.js PRECACHE list (bump CACHE_VERSION).
+- Add the article to articles.html, sitemap.xml and the sw.js PRECACHE list (then run node tools/stamp-sw.mjs).

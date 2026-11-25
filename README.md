@@ -35,7 +35,7 @@ ads.txt               Google AdSense publisher line (keep the filename lowercase
 robots.txt            Search engine rules (points to the sitemap)
 sitemap.xml           The public pages, using https://mindfuljoy.app
 manifest.webmanifest  Web app manifest (name, colors, icons) so the site can be installed
-sw.js                 Service worker: saves the site for offline use (network first; bump CACHE_VERSION to clear old copies)
+sw.js                 Service worker: saves the site for offline use and fast starts (cache first, with a "New version available" bar)
 wrangler.jsonc        Cloudflare Workers static-assets config (see Deploying)
 .assetsignore         Repo files that Cloudflare should NOT publish on the site
 LICENSE               MIT License
@@ -108,7 +108,7 @@ EEA, UK and Switzerland, and update Privacy Policy section 5 to match.
 
 **Articles.** `articles.html` lists the guides and is indexed. To add an article, copy `getting-started.html`,
 change the title, description, `canonical`, `og:url` and Article JSON-LD, list it on `articles.html`, add it to
-`sitemap.xml` and to the `PRECACHE` list in `sw.js` (and bump `CACHE_VERSION`). The updates strip text is the
+`sitemap.xml` and to the `PRECACHE` list in `sw.js` (then run `node tools/stamp-sw.mjs`). The updates strip text is the
 `UPDATE` object at the top of the strip code in `assets/js/menu.js`.
 
 ## Header menu and updates strip
@@ -144,7 +144,7 @@ Third-party assets keep their own licenses:
   length, kind) and `mj.consent.v1` (cookie notice choice). Export / Import in the gear menu saves and reads a JSON
   backup of the history (and, optionally, the settings); imports are checked and merged by session id.
   Nothing is sent to a server by the site itself. The service worker also keeps a saved copy of the site's own
-  files in the browser (cache `mj-v12`; bump `CACHE_VERSION` in `sw.js` when the file list changes). The settings
+  files in the browser (cache first; run `node tools/stamp-sw.mjs` after changing any site file, it writes the cache version in `sw.js`, and `node --test tests/*.mjs` fails if you forget). The settings
   record also holds the Pomodoro and Count Up options and the vibration switch.
 - Outside requests the pages make: Google AdSense only (the Inter font is self-hosted in `assets/fonts/`).
   Everything else comes from this site's own files.
