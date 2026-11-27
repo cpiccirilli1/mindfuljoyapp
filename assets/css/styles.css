@@ -318,12 +318,17 @@
   input[type=range]{ width:100%; min-height:32px; accent-color:var(--accent); cursor:pointer; }
   .shortcut-hint{ font-size:.74rem; color:var(--text-dim); margin:22px 0 0; text-align:center; }
   @media (hover:none){ .shortcut-hint{ display:none; } }
-  /* "New version available" bar (pwa.js) */
-  .update-toast{ position:fixed; left:50%; bottom:max(16px, env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:10px; max-width:calc(100vw - 32px); padding:10px 12px 10px 16px; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:999px; box-shadow:0 6px 24px rgba(0,0,0,.18); font-size:.88rem; }
-  .update-toast span{ white-space:nowrap; }
-  .update-toast button{ font:inherit; cursor:pointer; border-radius:999px; padding:6px 14px; border:1px solid var(--accent); }
-  .update-toast .ut-reload{ background:var(--accent); color:var(--bg); }
-  .update-toast .ut-later{ background:transparent; color:var(--text-dim); border-color:transparent; }
+  /* Long how-to pages: a row of jump links near the top and a "Back to top" link after each part */
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+  .info-view h1, .info-view h2{ scroll-margin-top:16px; }
+  .info-view .jump{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 22px; font-size:.88rem; }
+  .info-view .jump span{ color:var(--text-dim); }
+  .info-view .jump a{ color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:5px 14px; text-decoration:none; }
+  .info-view .jump a:hover{ background:var(--accent-soft); }
+  .info-view .top-link{ margin:18px 0 6px; text-align:right; font-size:.85rem; }
+  .info-view .top-link a{ color:var(--text-dim); text-decoration:none; }
+  .info-view .top-link a:hover{ color:var(--accent); text-decoration:underline; }
   .help-hint{ font-size:.82rem; color:var(--text-dim); margin:10px 0 0; text-align:center; }
   .help-hint a{ color:var(--accent); text-underline-offset:2px; }
   .help-hint a:hover{ color:var(--text); }
